@@ -1,5 +1,9 @@
 function updateTempDarkCoreCost(){
 	let nAmt = player.dc.cores.max(tmp.dc.bulk)
+	let fp = getDarkCoreFP()
+	let baseCost = new ExpantaNum("1e240")
+	let expBase = new ExpantaNum("1e1300")
+	let expMulti = new ExpantaNum(1.01)
 
 	let start = getScalingStart("scaled", "darkCore");
 	let power = scalingActive("darkCore", nAmt, "scaled") ? getScalingPower("scaled", "darkCore") : 0
@@ -11,55 +15,56 @@ function updateTempDarkCoreCost(){
 	let power3 = getScalingPower("hyper", "darkCore");
 	let base3 = ExpantaNum.pow(1.03, power3);
 
-	let bcMult = modeActive("extreme") ? 0.25 : 10
+	let bcMult = modeActive("extreme") ? 0.025 : 1
 
-	let starting 
-	if (scalingActive("darkCore", nAmt, "hyper")) {
+	let starting = player.dc.cores
+	/****if (scalingActive("darkCore", nAmt, "hyper")) {
 		if (!(scalingActive("darkCore", player.dc.cores, "hyper")) && (!modeActive("extreme")&&!modeActive("hikers_dream"))) starting = player.dc.cores;
 		else starting = ExpantaNum.pow(base3, player.dc.cores.sub(start3)).times(start3)
-	} else {
-		starting = player.dc.cores
-	}
-
+	} else {*/
+	//}
 	tmp.dc.coreCost = ExpantaNum.pow(
-		10,
+		expBase,
 		ExpantaNum.pow(
-			10,
-			starting
-				.pow(exp2)
-				.div(start2.pow(exp2.sub(1)))
-				.pow(exp)
-				.div(start.pow(exp.sub(1)))
-				.div(50)
-				.plus(1)
+			expMulti,
+			player.dc.cores.div(fp)
 		)
-	).times(bcMult);
-	let starting2 = player.collapse.cadavers
-		.div(bcMult)
-		.max(1)
-		.log10()
-		.max(1)
-		.log10()
-		.sub(1)
-		.times(50)
-		.times(start.pow(exp.sub(1)))
-		.pow(exp.pow(-1))
-		.times(start2.pow(exp2.sub(1)))
-		.pow(exp2.pow(-1))
+	)
+	.div(expBase)
+	.times(baseCost)
+	.times(bcMult)
+	.div(getDarkCoreCostDiscount())
+
+
+	tmp.dc.bulk = ExpantaNum.logBase(
+		ExpantaNum.logBase(
+			player.collapse.cadavers.times(expBase).div(baseCost).div(bcMult).times(getDarkCoreCostDiscount())
+			.max(1),
+			expBase
+		),
+		expMulti
+	).add(1).floor()
+}
+
+function getDarkCoreCostDiscount() {
+	let discount = new ExpantaNum(1)
+	return discount
+}
+
+function getDarkCoreFP() {
+	let fp = new ExpantaNum(1)
+	if (player.tier.gte(tierRewardReq[11])) fp = fp.times(getTierEffects("12"))
+	if (player.tr.upgrades.includes(13) && !HCCBA("noTRU")) fp = fp.times(tr13Eff()["coreFP"])
 	
-	if (scalingActive("darkCore", nAmt, "hyper")) {
-		if (!(scalingActive("darkCore", player.dc.cores, "hyper")) && (!modeActive("extreme")&&!modeActive("hikers_dream"))) tmp.dc.bulk = starting2.add(1);
-		else tmp.dc.bulk = starting2.div(start3).max(1).logBase(base3).add(start3).add(1);
-	} else tmp.dc.bulk = starting2.add(1);
+	return fp
 }
 
 function calcDarkFlow(){
 	tmp.dc.flow = new ExpantaNum(1);
-	if (tmp.ach[75].has) tmp.dc.flow = tmp.dc.flow.times(1.1);
-	if (tmp.ach[83].has) tmp.dc.flow = tmp.dc.flow.times(1.2);
+	if (player.rank.gte(rankRewardReq[38])) tmp.dc.flow = tmp.dc.flow.times(getRankEffects("39"))
+	if (player.tr.upgrades.includes(15) && !HCCBA("noTRU")) tmp.dc.flow = tmp.dc.flow.times(tr15Eff());
+	if (tmp.ach[75].has) tmp.dc.flow = tmp.dc.flow.times(ach75Eff());
 	if (tmp.ach[131].has) tmp.dc.flow = tmp.dc.flow.times(1.5);
-	if (player.tr.upgrades.includes(11) && !HCCBA("noTRU")) tmp.dc.flow = tmp.dc.flow.times(tr11Eff()["dcf"]);
-	if (player.tr.upgrades.includes(12) && !HCCBA("noTRU")) tmp.dc.flow = tmp.dc.flow.times(tr12Eff());
 	if (tmp.inf) {
 		if (tmp.inf.upgs.has("4;1")) tmp.dc.flow = tmp.dc.flow.times(2);
 		if (tmp.inf.upgs.has("5;1")) tmp.dc.flow = tmp.dc.flow.times(2);
@@ -82,43 +87,56 @@ function calcDarkFlow(){
 
 function calcDarkCircleBonus(){
 	tmp.dc.power = new ExpantaNum(1);
-	if (player.tr.upgrades.includes(15) && !HCCBA("noTRU")) tmp.dc.power = tmp.dc.power.times(tr15Eff());
 	if (tmp.inf) if (tmp.inf.stadium.completed("reality") && mltRewardActive(1)) tmp.dc.power = tmp.dc.power.times(8);
-	tmp.dc.dmEff = player.dc.matter.times(tmp.dc.flow).plus(1).pow(ExpantaNum.mul(0.1, tmp.dc.power));
-	tmp.dc.deEff = player.dc.energy.times(tmp.dc.flow).plus(1).pow(ExpantaNum.mul(0.125, tmp.dc.power));
-	if (tmp.inf && tmp.inf.upgs.has("6;8")) {
+	tmp.dc.dmEff = player.dc.matter.plus(1)
+		.pow(
+			player.dc.matter.plus(1).log10().plus(1).log10().plus(1)
+			.times(tmp.dc.power)
+		)
+	tmp.dc.deEff = player.dc.energy.plus(1)
+		.pow(
+			player.dc.energy.plus(1).log10().plus(1).log10().plus(1)
+			.times(tmp.dc.power)
+		)
+	/*if (tmp.inf && tmp.inf.upgs.has("6;8")) {
 		tmp.dc.dmEff = tmp.dc.dmEff.max(
 			player.dc.matter
-				.times(tmp.dc.flow)
 				.plus(1)
 				.pow(
 					ExpantaNum.mul(
-						ExpantaNum.pow(2, player.dc.matter.plus(10).slog(10).sub(1)).div(10),
-						tmp.dc.power
-					)
-				)
-				.pow(5)
-		);
-		tmp.dc.deEff = tmp.dc.deEff.max(
-			player.dc.energy
-				.times(tmp.dc.flow)
-				.plus(1)
-				.pow(
-					ExpantaNum.mul(
-						ExpantaNum.pow(2, player.dc.energy.plus(10).slog(10).sub(1)).div(8),
+						player.dc.matter.plus(1).log10().plus(1).log10().plus(1),
 						tmp.dc.power
 					)
 				)
 				.pow(10)
 		);
-	}
-	tmp.dc.dfEff = extremeStadiumActive("spectra", 4) ? new ExpantaNum(0) : (player.dc.fluid.times(tmp.dc.flow).plus(1).log10().plus(1).log10().times(tmp.dc.power));
+		tmp.dc.deEff = tmp.dc.deEff.max(
+			player.dc.energy
+				.plus(1)
+				.pow(
+					ExpantaNum.mul(
+						player.dc.energy.plus(1).log10().plus(1).log10().plus(1),
+						tmp.dc.power
+					)
+				)
+				.pow(15)
+		);
+	}*/
+	tmp.dc.dfEff = extremeStadiumActive("spectra", 4) ? new ExpantaNum(1) : (
+		player.dc.fluid.plus(1)
+		.pow(
+			player.dc.fluid.plus(1).log10().plus(1).log10().plus(1).pow(4)
+			.times(tmp.dc.power)
+			.times(3)
+		)
+	);
 }
 
 function calcDarkCircleGain(){
 	tmp.dc.dmGain = ExpantaNum.pow(2, player.dc.cores).sub(1).times(player.dc.fluid.plus(1).log10().plus(1)).max(0);
 	tmp.dc.deGain = player.dc.matter.plus(1).log10();
 	tmp.dc.dfGain = player.dc.energy.plus(1).log10();
+
 	if (tmp.inf && tmp.inf.upgs.has("8;1")) {
 		let fp = new ExpantaNum(1);
 		if (tmp.inf.upgs.has("8;8")) fp = fp.times(INF_UPGS.effects["8;8"]());
@@ -140,7 +158,11 @@ function calcDarkCircleGain(){
 			.plus(1)
 			.log10()
 			.times(player.dc.energy.plus(1).pow(ExpantaNum.mul(1 / 5, fp)));
-	}
+	}/* */
+
+	if (player.tr.upgrades.includes(14) && !HCCBA("noTRU")) tmp.dc.deGain = tmp.dc.deGain.times(tr14Eff())
+	if (player.tr.upgrades.includes(14) && !HCCBA("noTRU")) tmp.dc.dfGain = tmp.dc.dfGain.times(tr14Eff())
+
 }
 
 function calcDarkCircleAllComp(){
@@ -151,10 +173,7 @@ function calcDarkCircleAllComp(){
 }
 
 function calcDarkCircleCoreEff(){
-	tmp.dc.coreEff =
-		player.dc.cores.gte(modeActive("extreme")?21:12)
-			? player.dc.cores.pow(7).div(ExpantaNum.pow(modeActive("extreme")?21:12, 6).times(8)).plus(1).log10().plus(1).logBase(modeActive("extreme")?1e3:10)
-			: new ExpantaNum(0);
+	tmp.dc.coreEff = player.dc.cores.times(0.025).plus(1)
 }
 
 function updateTempDC() { // 339 Normal Mode

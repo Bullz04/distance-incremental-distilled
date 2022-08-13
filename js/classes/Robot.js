@@ -4,11 +4,11 @@ class Robot {
 		this.fl = fl;
 		this.unl = Object.keys(player.automation.robots).includes(this.name);
 		this.tabOpen = player.automation.open == this.name;
-		this.i =
+		this.i = //interval
 			player.automation.robots[this.name] === undefined
 				? new ExpantaNum(0)
 				: player.automation.robots[this.name][0];
-		this.m =
+		this.m = //magnitude
 			player.automation.robots[this.name] === undefined
 				? new ExpantaNum(0)
 				: player.automation.robots[this.name][1];
@@ -16,7 +16,11 @@ class Robot {
 
 	get interval() {
 		return this.unl
-			? ExpantaNum.div(ROBOT_START_INTERVAL[this.name], this.i.plus(1).times(tmp.auto.intMod))
+			? ExpantaNum.div(ROBOT_START_INTERVAL[this.name],
+				this.i.plus(1)
+				.times(tmp.auto.intMod)
+				.times(tmp.rd ? tmp.rd.intMult[this.name] : 1)
+			)
 			: new ExpantaNum(1 / 0);
 	}
 
@@ -27,6 +31,7 @@ class Robot {
 					.times(tmp.auto.magMod)
 					.pow(2)
 					.plus(1)
+					.times(tmp.rd ? tmp.rd.magMult[this.name] : 1)
 					.pow(tmp.rd ? tmp.rd.mp[this.name] : 1)
 			: new ExpantaNum(0);
 	}

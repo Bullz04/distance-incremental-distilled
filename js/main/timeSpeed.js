@@ -20,15 +20,14 @@ function updateTempTimeSpeed() {
 	if (player.rank.gte(rankRewardReq[23])) tmp.timeSpeed = tmp.timeSpeed.times(getRankEffects("24"))
 	if (player.rank.gte(rankRewardReq[25])) tmp.timeSpeed = tmp.timeSpeed.times(getRankEffects("26"))
 	if (player.rank.gte(rankRewardReq[26])) tmp.timeSpeed = tmp.timeSpeed.times(getRankEffects("27"))
-	if (player.tier.gt(6)) tmp.timeSpeed = tmp.timeSpeed.times(1.5);
-	if (player.tier.gt(7)) tmp.timeSpeed = tmp.timeSpeed.times(tier7Eff());
-	if (player.tier.gt(16)) tmp.timeSpeed = tmp.timeSpeed.times(1.6);
-	if (player.tier.gt(18)) tmp.timeSpeed = tmp.timeSpeed.times(1.8);
-	if (player.tier.gt(20)) tmp.timeSpeed = tmp.timeSpeed.times(2);
+
+	if (player.tier.gte(tierRewardReq[6])) tmp.timeSpeed = tmp.timeSpeed.times(getTierEffects("7"))
+	if (player.tier.gte(tierRewardReq[7])) tmp.timeSpeed = tmp.timeSpeed.times(getTierEffects("8"))
+	
 	tmp.timeSpeed = tmp.timeSpeed.times(getCadaverEff().max(1));
 	if (hasCollapseMilestone(1)) tmp.timeSpeed = tmp.timeSpeed.times(collapseMile1Eff());
 	if (hasCollapseMilestone(2)) tmp.timeSpeed = tmp.timeSpeed.times(modeActive("extreme")?2:5);
-	if (tmp.inf.upgs.has("1;1")) tmp.timeSpeed = tmp.timeSpeed.times(INF_UPGS.effects["1;1"]());
+	//if (tmp.inf.upgs.has("1;1")) tmp.timeSpeed = tmp.timeSpeed.times(INF_UPGS.effects["1;1"]());
 	if (tmp.inf.upgs.has("7;7")) tmp.timeSpeed = tmp.timeSpeed.times(INF_UPGS.effects["7;7"]()["ts"]);
 	if (tmp.inf.upgs.has("9;4")) tmp.timeSpeed = tmp.timeSpeed.times(INF_UPGS.effects["9;4"]());
 	if (tmp.inf.stadium.completed("eternity")) tmp.timeSpeed = tmp.timeSpeed.times(STADIUM_REWARDS.effects.eternity());

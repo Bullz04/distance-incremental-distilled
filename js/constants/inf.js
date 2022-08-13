@@ -4,31 +4,31 @@ const INF_UPGS = {
 	rows: 10,
 	cols: 10,
 	dispReqs: {
-		4: new ExpantaNum(3),
-		5: new ExpantaNum(6),
-		6: new ExpantaNum(10),
-		7: new ExpantaNum(15),
-		8: new ExpantaNum(21),
-		9: new ExpantaNum(28),
+		4: new ExpantaNum(4),//3
+		5: new ExpantaNum(1e16),//6
+		6: new ExpantaNum(1e110),//10
+		7: new ExpantaNum(1e115),//15
+		8: new ExpantaNum(1e121),//21
+		9: new ExpantaNum(1e128),//28
 	},
 	rowReqs: {
 		4: function () {
-			return player.inf.endorsements.gte(3);
+			return player.inf.endorsements.gte(4);
 		},
 		5: function () {
-			return player.inf.endorsements.gte(6);
+			return player.inf.endorsements.gte(1e16);
 		},
 		6: function () {
-			return player.inf.endorsements.gte(10);
+			return player.inf.endorsements.gte(1e110);
 		},
 		7: function () {
-			return player.inf.endorsements.gte(15);
+			return player.inf.endorsements.gte(1e115);
 		},
 		8: function () {
-			return player.inf.endorsements.gte(21);
+			return player.inf.endorsements.gte(1e121);
 		},
 		9: function () {
-			return player.inf.endorsements.gte(28);
+			return player.inf.endorsements.gte(1e128);
 		},
 		10: function() {
 			return tmp.elm.bos.hasHiggs("4;0;0");
@@ -36,22 +36,22 @@ const INF_UPGS = {
 	},
 	colReqs: {
 		4: function () {
-			return player.inf.endorsements.gte(3);
+			return player.inf.endorsements.gte(4);
 		},
 		5: function () {
-			return player.inf.endorsements.gte(6);
+			return player.inf.endorsements.gte(1e16);
 		},
 		6: function () {
-			return player.inf.endorsements.gte(10);
+			return player.inf.endorsements.gte(1e110);
 		},
 		7: function () {
-			return player.inf.endorsements.gte(15);
+			return player.inf.endorsements.gte(1e115);
 		},
 		8: function () {
-			return player.inf.endorsements.gte(21);
+			return player.inf.endorsements.gte(1e121);
 		},
 		9: function () {
-			return player.inf.endorsements.gte(28);
+			return player.inf.endorsements.gte(1e128);
 		},
 		10: function() {
 			return tmp.elm.bos.hasHiggs("4;0;0");
@@ -59,9 +59,9 @@ const INF_UPGS = {
 	},
 	costs: {
 		"1;1": new ExpantaNum(40),
-		"1;2": new ExpantaNum(200),
+		"1;2": new ExpantaNum(100),
 		"1;3": new ExpantaNum(3.5e3),
-		"1;4": new ExpantaNum(1e4),
+		"1;4": new ExpantaNum(1e8),
 		"1;5": new ExpantaNum(1e7),
 		"1;6": new ExpantaNum(2.5e10),
 		"1;7": new ExpantaNum(5e19),
@@ -70,25 +70,25 @@ const INF_UPGS = {
 		"1;10": new ExpantaNum(1e75),
 		"2;1": new ExpantaNum(200),
 		"2;2": new ExpantaNum(400),
-		"2;3": new ExpantaNum(8e3),
-		"2;4": new ExpantaNum(5e4),
+		"2;3": new ExpantaNum(2e6),
+		"2;4": new ExpantaNum(1e9),
 		"2;5": new ExpantaNum(1e8),
 		"2;6": new ExpantaNum(5e10),
 		"2;7": new ExpantaNum(1e21),
 		"2;8": new ExpantaNum(2.5e23),
 		"2;9": new ExpantaNum(1.2e35),
 		"2;10": new ExpantaNum(1e115),
-		"3;1": new ExpantaNum(1e3),
-		"3;2": new ExpantaNum(8e3),
-		"3;3": new ExpantaNum(5e4),
-		"3;4": new ExpantaNum(1e5),
+		"3;1": new ExpantaNum(1e5),
+		"3;2": new ExpantaNum(3.5e5),
+		"3;3": new ExpantaNum(7e7),
+		"3;4": new ExpantaNum(3e9),
 		"3;5": new ExpantaNum(2.5e8),
 		"3;6": new ExpantaNum(1e11),
 		"3;7": new ExpantaNum(4e21),
 		"3;8": new ExpantaNum(4e23),
 		"3;9": new ExpantaNum(1e39),
 		"3;10": new ExpantaNum(1.2e120),
-		"4;1": new ExpantaNum(1e4),
+		"4;1": new ExpantaNum(1e40),
 		"4;2": new ExpantaNum(5e4),
 		"4;3": new ExpantaNum(1e5),
 		"4;4": new ExpantaNum(2.5e5),
@@ -162,15 +162,15 @@ const INF_UPGS = {
 	descs: {
 		"1;1": "Ranks & Tiers boost Time Speed.",
 		"1;2": "Knowledge boosts Rocket gain.",
-		"1;3": "Start with the first 2 rows of Time Reversal upgrades on reset.",
-		"1;4": "Keep Time Reversal upgrades on reset.",
+		"1;3": "Start with the first 2 rows of Time Reversal upgrades and all Collapse Milestones on reset.",
+		"1;4": "Rockets boost their gain",
 		"1;5": "Scaled Tier scaling is 20% weaker.",
 		"1;6": "Scaled Rank & Tier scaling starts 2 later.",
 		"1;7": "Before any other boosts, Knowledge gain is raised to the power of 1.25.",
 		"1;8": "Time Reversal Upgrade 11 is stronger based on your Accelerational Energy.",
 		"1;9": "inf9;7 is stronger based on your Tier.",
 		"1;10": "Hyper Tier scaling is weaker based on your Knowledge.",
-		"2;1": "Knowledge boosts the Rocket effect.",
+		"2;1": "Knowledge boosts pathogen gain, and ash gain.",
 		"2;2": "Time Speed boosts Knowledge gain at a reduced rate.",
 		"2;3": "Knowledge & Time Cubes synergize with one another.",
 		"2;4": "Gain 1% of Cadaver gain every second.",
@@ -180,10 +180,10 @@ const INF_UPGS = {
 		"2;8": "Base Knowledge gain is boosted by Heavenly Chips & Demonic Souls.",
 		"2;9": "Unlock 5 new Pathogen Upgrades.",
 		"2;10": "Superscaled Dark Core scaling starts 5 later, triple Base Knowledge gain, & before any other boosts, Knowledge gain is raised to the power of 1.15.",
-		"3;1": "Start with all Collapse Milestones on reset.",
+		"3;1": () => "Each level of 4th Pathogen Upgrade (^" + showNum(INF_UPGS.effects["3;1"]()["amountPower"]) + ") boosts pathogen gain by +x" + showNum(INF_UPGS.effects["3;1"]()["base"]) + ".",
 		"3;2": "Knowledge & Cadavers synergize with one another.",
-		"3;3": "Pathogen Upgrades are 10% stronger.",
-		"3;4": "Unlock Auto-Pathogen upgrades.",
+		"3;3": "4th Pathogen Upgrade levels are raised to number shown to inf3;1 upgrde effect and unlock Auto-Pathogen upgrades.",
+		"3;4": () => "Cadavers have better effect past " + showNum("1e1000") + " cadavers.",
 		"3;5": "Scaled Rocket Fuel scaling is 25% weaker.",
 		"3;6": "Pathogen Upgrades softcap 1 later.",
 		"3;7": "Enlightenments boost Ascension Power gain.",
@@ -291,10 +291,10 @@ const INF_UPGS = {
 		"3;8": ["2;8"],
 		"3;9": ["2;9"],
 		"3;10": ["9;9"],
-		"4;1": ["3;2"],
+		"4;1": ["3;2", "3;4"],
 		"4;2": ["4;1"],
 		"4;3": ["4;2"],
-		"4;4": ["4;3"],
+		"4;4": ["3;4","4;3"],
 		"4;5": ["4;4"],
 		"4;6": ["5;5"],
 		"4;7": ["3;7"],
@@ -363,20 +363,18 @@ const INF_UPGS = {
 		"10;10": ["10;9", "9;10"],
 	},
 	repeals: {
-		"2;2": ["1;2", "2;1"],
-		"2;3": ["3;2"],
-		"2;4": ["3;2"],
-		"3;2": ["2;1"],
-		"3;3": ["2;2"],
+		"2;2": ["1;2"],
+		//"2;3": ["3;2"],
+		//"2;4": ["3;2"],
+		"3;2": ["1;1"],
 		"4;2": ["2;3"],
 		"5;5": ["4;1", "5;1"]
 	},
 	repealed: {
+		"1;1": ["3;2"],
 		"1;2": ["2;2"],
-		"2;1": ["2;2", "3;2"],
-		"2;2": ["3;3"],
 		"2;3": ["4;2"],
-		"3;2": ["2;3", "2;4"],
+		//"3;2": ["2;4"],//also "2;3"
 		"4;1": ["5;5"],
 		"5;1": ["5;5"]
 	},
@@ -391,9 +389,12 @@ const INF_UPGS = {
 			return ret;
 		},
 		"1;2": function () {
-			let exp = player.inf.knowledge.plus(1).slog(2);
-			let ret = player.inf.knowledge.plus(1).log10().plus(1).pow(exp);
+			let ret = player.inf.knowledge.plus(1);
 			return ret;
+		},
+		"1;4": function () {
+			let eff = player.rockets.plus(10).logBase(10).pow(2)
+			return eff
 		},
 		"1;8": function () {
 			let e = tmp.accEn ? tmp.accEn : new ExpantaNum(0);
@@ -414,13 +415,17 @@ const INF_UPGS = {
 			return ret
 		},
 		"2;1": function () {
-			let ret = player.inf.knowledge.plus(1).slog(10).sqrt();
-			if (ret.gte(1.1)) ret = ret.pow(0.001).times(ExpantaNum.pow(1.1, 0.999));
-			return ret.max(1);
+			let ret = player.inf.knowledge.plus(1).logBase(10).plus(1).logBase(2).times(0.1).plus(1);
+			let pathogenRet = player.inf.knowledge.plus(10).logBase(10)
+			let ashRet = player.inf.knowledge.plus(10).logBase(10).pow(1.5)
+			return {
+				tierFP: ret.max(1),
+				pathogenGain: pathogenRet,
+				ashGain: ashRet
+			}
 		},
 		"2;2": function () {
-			let ret = tmp.timeSpeed ? tmp.timeSpeed.log10().plus(1) : new ExpantaNum(1);
-			if (modeActive('extreme')) ret = ret.div(2).max(1)
+			let ret = tmp.timeSpeed ? tmp.timeSpeed.max(1).plus(1).log10().plus(1) : new ExpantaNum(1);
 			return ret;
 		},
 		"2;3": function () {
@@ -432,7 +437,7 @@ const INF_UPGS = {
 			};
 			return {
 				knowledge: player.tr.cubes.plus(1).log10().plus(1).log10().plus(1).pow(pow.knowledge),
-				cubes: player.inf.knowledge.plus(1).pow(pow.cubes)
+				cubes: player.inf.knowledge.plus(1).pow(pow.cubes).pow(1.5)
 			};
 		},
 		"2;7": function () {
@@ -445,17 +450,33 @@ const INF_UPGS = {
 			let ret = v[0].plus(1).times(v[1].plus(1)).log10().plus(1);
 			return ret;
 		},
+		"3;1": function () {
+			let base = new ExpantaNum(0.05)
+			let amtPow = new ExpantaNum(1)
+			if (tmp.inf) if (tmp.inf.upgs.has("3;3")) amtPow = amtPow.times(INF_UPGS.effects["3;3"]());
+
+			let eff = player.pathogens.upgrades[4].pow(amtPow).times(base).plus(1)
+			return {base: base, effect: eff, amountPower: amtPow}
+		},
 		"3;2": function () {
 			let exp = new ExpantaNum(1);
 			if (tmp.inf) if (tmp.inf.upgs.has("7;4")) exp = exp.times(INF_UPGS.effects["7;4"]());
 			let pow = {
-				knowledge: player.collapse.cadavers.plus(1).slog(2).plus(1).log10().times(exp),
-				cadavers: player.inf.knowledge.plus(1).slog(10).plus(1).log10().times(exp)
+				knowledge: player.collapse.cadavers.plus(1).slog(2).plus(1).log10().times(exp).times(1.4),
+				cadavers: player.inf.knowledge.plus(1).slog(10).plus(1).log10().times(exp).times(1.25)
 			};
 			return {
 				knowledge: player.collapse.cadavers.plus(1).log10().plus(1).log10().plus(1).pow(pow.knowledge),
 				cadavers: player.inf.knowledge.plus(1).pow(pow.cadavers)
 			};
+		},
+		"3;3": function () {
+			return new ExpantaNum(1.25)
+		},
+		"3;4": function () {
+			let x = player.collapse.cadavers.max("1e1000").minus("1e1000").div("1e1000")
+			let eff = x.plus(1).pow(0.2)
+			return eff
 		},
 		"3;7": function () {
 			let enl = player.inf.ascension.enlightenments.reduce((x, y) => ExpantaNum.add(x, y));
@@ -715,8 +736,11 @@ const INF_TABS = {
 	infinity: function () {
 		return true;
 	},
+	brain: function() {
+		return player.inf.endorsements.gte(5) || player.inf.brain.unl
+	},
 	ascension: function () {
-		return player.inf.endorsements.gte(10) && !(mltActive(3) && player.mlt.mlt3selected.length>=1 && !player.mlt.mlt3selected.includes("ascension"));
+		return player.inf.endorsements.gte(12) && !(mltActive(3) && player.mlt.mlt3selected.length>=1 && !player.mlt.mlt3selected.includes("ascension"));
 	},
 	stadium: function () {
 		return player.inf.endorsements.gte(15) && !(mltActive(3) && player.mlt.mlt3selected.length>=1 && !player.mlt.mlt3selected.includes("stadium"));

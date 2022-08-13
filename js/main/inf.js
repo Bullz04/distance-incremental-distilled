@@ -1,6 +1,6 @@
 function updateTempInfUpgs() {
 	// Unrepealed Infinity Upgrades
-	tmp.infUr = [];
+	tmp.infUr = [];//Infinity upgrade unrepealed
 	if (tmp.inf)
 		if (tmp.inf.upgs.has("4;4")) {
 			tmp.infUr.push("2;1");
@@ -50,7 +50,22 @@ function updateTempInfUpgs() {
 		return player.inf.upgrades.includes(id);
 	};
 	if (!tmp.inf.upgs.current) tmp.inf.upgs.current = function (id) {
-		if (id=="4;10") return "^"+showNum(INF_UPGS.effects[id]())
+		if (id=="4;10" || id=="3;3") return "^"+showNum(INF_UPGS.effects[id]())
+		else if (id == "3;1") return "x" + showNum(INF_UPGS.effects[id]()["effect"])
+		else if (id == "2;1") {
+			return "Pathogen Gain: " +
+				showNum(INF_UPGS.effects[id]()["pathogenGain"]) +
+				"x, Ash Gain: " +
+				showNum(INF_UPGS.effects[id]()["ashGain"]) +
+				"x"
+		}
+		/*else if (id == "3;3") {
+			return "Pathogen Gain: " +
+				showNum(INF_UPGS.effects[id]()["pathogenGain"]) +
+				"x, Ash Gain: " +
+				showNum(INF_UPGS.effects[id]()["ashGain"]) +
+				"x"
+		}*/
 		else if (id == "2;3")
 			return (
 				"Time Cubes: " +
@@ -112,7 +127,6 @@ function updateTempInfUpgs() {
 	};
 	if (!tmp.inf.upgs.hover) tmp.inf.upgs.hover = function (id) {
 		tmp.infSelected = id;
-		if (tmp.el) tmp.el.infUpgData.setHTML(tmp.inf.upgs.desc(tmp.infSelected));
 	};
 	if (!tmp.inf.upgs.canBuy) tmp.inf.upgs.canBuy = function (id) {
 		let reqData = INF_UPGS.reqs[id];
@@ -124,7 +138,11 @@ function updateTempInfUpgs() {
 	if (!tmp.inf.upgs.desc) tmp.inf.upgs.desc = function (sel) {
 		if (sel === undefined) return "";
 		return (
-			((sel=="10;1"&&hasMltMilestone(16))?"Superscaled Pathogen Upgrade scaling is weaker based on your Ascension Power, and Distance produces your last Derivative at a reduced rate (unaffected by Time Speed)":INF_UPGS.descs[sel]) +
+			(
+				(sel=="10;1"&&hasMltMilestone(16))
+				? "Superscaled Pathogen Upgrade scaling is weaker based on your Ascension Power, and Distance produces your last Derivative at a reduced rate (unaffected by Time Speed)"
+				: ((typeof INF_UPGS.descs[sel] === "function") ? INF_UPGS.descs[sel]() : INF_UPGS.descs[sel])
+			) +
 			"<br>" +
 			(!tmp.inf.upgs.has(sel)
 				? "Cost: " +
@@ -203,16 +221,17 @@ function updateTempInfLayer() {
 	if (player.mlt.times.gt(0) && tmp.mlt) tmp.inf.emPow = tmp.inf.emPow.times(tmp.mlt.quilts[2].eff)
 	calcKnowledgeGain()
 	
-
-	tmp.inf.req = ExpantaNum.pow(tmp.inf.bc, ExpantaNum.pow(ExpantaNum.pow(1.1, tmp.inf.fp), player.inf.endorsements));
+	//exponent multiplier will be 1.07x
+	tmp.inf.req = ExpantaNum.pow(tmp.inf.bc, ExpantaNum.pow(1.07, player.inf.endorsements.div(tmp.inf.fp))).times(DISTANCES.uni);
 	if (player.distance.lt(tmp.inf.bc)) tmp.inf.bulk = new ExpantaNum(0);
-	else tmp.inf.bulk = player.distance
-			.plus(1)
+	else tmp.inf.bulk = player.distance.div(DISTANCES.uni)
+			.max(1)
 			.logBase(tmp.inf.bc)
-			.logBase(ExpantaNum.pow(1.1, tmp.inf.fp))
+			.logBase(1.07)
+			.times(tmp.inf.fp)
 			.plus(1)
 			.floor();
-	if (scalingActive("endorsements", player.inf.endorsements.max(tmp.inf.bulk), "scaled")) {
+	/*if (scalingActive("endorsements", player.inf.endorsements.max(tmp.inf.bulk), "scaled")) {
 		let start = getScalingStart("scaled", "endorsements");
 		let power = getScalingPower("scaled", "endorsements");
 		let exp = ExpantaNum.pow(1.5, power);
@@ -262,7 +281,7 @@ function updateTempInfLayer() {
 				.pow(exp2.pow(-1))
 				.plus(1)
 				.floor();
-	}
+	}/**/
 	tmp.inf.can = player.distance.gte(tmp.inf.req);
 	tmp.inf.layer = new Layer("inf", tmp.inf.can, "forced", true);
 	if (!tmp.inf.forceReset) tmp.inf.forceReset = function () {
@@ -296,11 +315,11 @@ function updateTempInfLayer() {
 			player.automation.unl = prev.automation.unl;
 			player.automation.robots = prev.automation.robots;
 		}
-		if (tmp.inf.upgs.has("1;4") || tmp.elm.bos.hasHiggs("0;0;0")) player.tr.upgrades = prev.tr.upgrades
+		if (/*tmp.inf.upgs.has("3;4") || */tmp.elm.bos.hasHiggs("0;0;0")) player.tr.upgrades = prev.tr.upgrades
 		else if (tmp.inf.upgs.has("1;3")) player.tr.upgrades = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-		if (tmp.inf.upgs.has("3;1")) {
+		if (tmp.inf.upgs.has("1;3")) {
 			player.collapse.unl = true;
-			player.collapse.lifeEssence = new ExpantaNum(10000);
+			player.collapse.lifeEssence = new ExpantaNum(1e22);
 		}
 		if (tmp.inf.upgs.has("7;3")) player.dc.unl = true;
 		tmp.doDervReset();
@@ -326,7 +345,7 @@ function updateTempInfLayer() {
 		}
 		infTab = name;
 	};
-	tmp.inf.updateTabs();
+	//tmp.inf.updateTabs();
 	if (!tmp.inf.manualReset) {
 		tmp.inf.manualReset = function (noStadium=false) {
 			if (tmp.canCompleteStadium&&!noStadium) {
@@ -350,6 +369,27 @@ function updateTempInfLayer() {
 function skipInfAnim() {
 	tmp.inf.layer.reset(false, false);
 	if (!showContainer) closeHiddenDiv(true)
+}
+
+function getMindMachineEffect() {
+	return ExpantaNum.pow(2, player.inf.brain.mindMachines)
+}
+
+function getNeuronGain() {
+	let gain = new ExpantaNum(1).times(getMindMachineEffect())
+	return gain
+}
+
+function updateTempBrain() {
+	if (!tmp.inf.brain) tmp.inf.brain = {}
+	if (!tmp.inf.brain.mindMachine) tmp.inf.brain.mindMachine = {}
+	tmp.inf.brain.mindMachine.next = player.inf.brain.mindMachines.pow(2).plus(player.inf.brain.mindMachines.times(5)).plus(900)
+	tmp.inf.brain.mindMachine.bulk = player.rank.minus(893.75).max(0).sqrt().minus(5/2).plus(1).floor()
+
+	if (!tmp.inf.brain.mindMachine.collect) tmp.inf.brain.mindMachine.collect = function() {
+		let diff = tmp.inf.brain.mindMachine.bulk.minus(player.inf.brain.mindMachines).max(0)
+		player.inf.brain.mindMachines = player.inf.brain.mindMachines.add(diff)
+	}
 }
 
 function updateTempAscension() {
@@ -443,7 +483,11 @@ function updateTempAscension() {
 }
 
 function updateTempEnlightenments() {
-	if (!tmp.inf.asc.costData) tmp.inf.asc.costData = { base: new ExpantaNum(modeActive('extreme')?1.5:2.5), start: new ExpantaNum(modeActive("extreme")?100:500), exp: new ExpantaNum(modeActive('extreme')?2:1.5) };
+	if (!tmp.inf.asc.costData) tmp.inf.asc.costData = {
+		base: new ExpantaNum(modeActive('extreme')?1.5:2.5),
+		start: new ExpantaNum(modeActive("extreme")?100:500),
+		exp: new ExpantaNum(modeActive('extreme')?2:1.5)
+	};
 	if (!tmp.inf.asc.enlCost) tmp.inf.asc.enlCost = function (n) {
 		let enl = player.inf.ascension.enlightenments[n - 1];
 		let cost = tmp.inf.asc.costData.base.pow(enl.pow(tmp.inf.asc.costData.exp)).times(tmp.inf.asc.costData.start);
@@ -997,6 +1041,7 @@ function updateTempInf() {
 	
 	updateTempInfUpgs();
 	updateTempInfLayer();
+	updateTempBrain();
 	updateTempAscension();
 	updateTempEnlightenments();
 	updateTempStadium();
@@ -1010,7 +1055,14 @@ function infTick(diff) {
 		adjustGen(tmp.inf.knowledgeGain, "knowledge").times(diff)
 	);
 	
-	if (player.inf.endorsements.gte(10) && !(mltActive(3) && !player.mlt.mlt3selected.includes("ascension"))) {
+	if (player.inf.brain.unl) {
+		tmp.inf.brain.mindMachine.collect()
+		player.inf.brain.neurons = player.inf.brain.neurons.plus(
+			getNeuronGain().times(diff)
+		)
+	}
+
+	if (player.inf.endorsements.gte(12) && !(mltActive(3) && !player.mlt.mlt3selected.includes("ascension"))) {
 		for (let i = 1; i <= 4; i++)
 			if (tmp.inf.asc.perkActive(i))
 				player.inf.ascension.time[i - 1] = player.inf.ascension.time[i - 1].sub(diff).max(0);

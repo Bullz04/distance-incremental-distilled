@@ -1,10 +1,10 @@
 function updateTempTR() {
 	if (tmp.tr===undefined) tmp.tr = {};
 	tmp.tr.txt = player.tr.active ? "Bring Time back to normal." : "Reverse Time.";
-	tmp.tr.esc = new ExpantaNum(1e20);
+	tmp.tr.esc = new ExpantaNum(1 / 0);
 	cubes = player.tr.cubes;
 	//if (cubes.gte(tmp.tr.esc)) cubes = cubes.cbrt().times(Math.pow(tmp.tr.esc, 2 / 3));
-	tmp.tr.eff = EN.log(cubes.plus(1), 10).times(2);
+	tmp.tr.eff = EN.logBase(cubes.plus(1), 10).times(2).root(1.1);
 	if (tmp.inf) if (tmp.inf.stadium.completed("reality")) tmp.tr.eff = tmp.tr.eff.times(mltRewardActive(1)?8:3);
 }
 
@@ -15,6 +15,7 @@ function getTimeCubeGain() {
 	if (player.rank.gte(rankRewardReq[18])) gain = gain.times(getRankEffects("19"));
 	if (player.tr.upgrades.includes(1) && !HCCBA("noTRU")) gain = gain.times(tr1Eff());
 	if (player.tr.upgrades.includes(4) && !HCCBA("noTRU")) gain = gain.times(tr4Eff());
+	if (player.tr.upgrades.includes(9) && !HCCBA("noTRU")) gain = gain.times(tr9Eff()["cubeGain"]);
 	if (tmp.ach[55].has) gain = gain.times(1.1);
 	if (tmp.ach[72].has && modeActive("extreme")) {
 		let exp = ExpantaNum.add(5, player.dc.cores.sqrt().times(5));
@@ -27,7 +28,6 @@ function getTimeCubeGain() {
 		gain = gain.times(player.furnace.coal.plus(1).log10().sqrt().plus(1));
 	if (tmp.pathogens && player.pathogens.unl) gain = gain.times(tmp.pathogens[3].eff());
 	if (tmp.dc) if (player.dc.unl) gain = gain.times(tmp.dc.deEff);
-	if (tmp.dc) if (player.tr.upgrades.includes(11)) gain = gain.times(tr11Eff()["cg"]);
 	if (tmp.inf) if (tmp.inf.upgs.has("2;3")) gain = gain.times(INF_UPGS.effects["2;3"]()["cubes"]);
 	return gain
 }
@@ -44,9 +44,14 @@ function buyTRUpg(n) {
 	player.tr.upgrades.push(n);
 }
 
+function tr1Pow() {
+	let pow = new ExpantaNum(1)
+	if (player.rank.gte(rankRewardReq[39])) pow = pow.times(getRankEffects("40"))
+	return pow
+}
 
 function tr1Eff() {
-	return ExpantaNum.pow(1.1, player.rank.plus(player.tier));
+	return ExpantaNum.pow(1.1, player.rank.plus(player.tier)).pow(tr1Pow());
 }
 
 function tr2Pow() {
@@ -65,30 +70,45 @@ function tr2Eff() {
 
 function tr4Eff() {
 	let r = player.rockets
-	return r.plus(1).root(20)
+	return ExpantaNum.pow(
+		10,
+		r.plus(1).max(1).logBase(10).pow(0.85).div(15)
+	)
 }
 
 function tr6Eff() {
-	return ExpantaNum.logBase(player.tr.cubes.plus(1), 10).times(0.1).plus(1)
+	return ExpantaNum.logBase(player.tr.cubes.plus(1), 10).times(0.1).plus(1).pow(1.25)
+}
+
+function tr7EffBase() {
+	return new ExpantaNum(1.1)
 }
 
 function tr7Eff() {
-	return ExpantaNum.pow(1.05, player.achievements.length)
+	return ExpantaNum.pow(tr7EffBase(), player.achievements.length)
 }
 
-function getTR89Mod() {
+function getTR9Mod() {
 	let mod = new ExpantaNum(1)
 	if (modeActive("hard")) mod = mod.div(((tmp.ach?tmp.ach[105].has:false)&&modeActive("extreme"))?0.9:2)
 	if (modeActive("easy")) mod = mod.times(3)
 	return mod
 }
 
+function tr8EffBase() {
+	let base = new ExpantaNum(0.01)
+	return base
+}
+
 function tr8Eff() {
-	return ExpantaNum.div(4, (tmp.auto ? tmp.auto.rankbot.interval.max(1e-10) : 1)).pow(getTR89Mod().div(3)).max(1)
+	return player.rank.times(tr8EffBase()).plus(1)
 }
 
 function tr9Eff() {
-	return ExpantaNum.div(5, (tmp.auto ? tmp.auto.tierbot.interval.max(1e-10) : 1)).pow(getTR89Mod().div(5)).max(1)
+	return {
+		cubeGain: EN.logBase(player.automation.intelligence.plus(1).max(1), 10).plus(1),
+		intelligenceGain: EN.logBase(player.tr.cubes.plus(1).max(1), 10).plus(1).pow(2)
+	}
 }
 
 function tr10Eff() {
@@ -103,32 +123,37 @@ function tr11Pow() {
 }
 
 function tr11Eff() {
-	return {
-		cg: tmp.dc ? tmp.dc.flow.pow(tmp.dc.flow.plus(1).slog(2).times(10).plus(1)).pow(tr11Pow()) : new ExpantaNum(1),
-		dcf: player.tr.cubes.plus(1).log10().div(75).plus(1).pow(tr11Pow())
-	}
+	return player.dc.matter.plus(1).root(4).pow(tr11Pow())
 }
 
 function tr12Eff() {
-	return tmp.dc ? tmp.dc.allComp.plus(1).sqrt() : new ExpantaNum(1)
+	return tmp.dc ? player.dc.fluid.plus(1).root(3) : new ExpantaNum(1)
 }
 
 function tr13Eff() {
-	return tmp.dc ? tmp.dc.allComp.plus(1).slog(2).pow(0.1).sub(1).max(0) : new ExpantaNum(0)
-}
-
-function tr14Eff() {
+	let x = player.tr.cubes.max("1e700").minus("1e700").div("1e700")
 	return {
-		cd: player.tier.plus(1).pow(1.25),
-		ss: player.dc.cores.plus(1).log10().plus(1).log10().times(7.5)
+		coreFP: x.plus(1).logBase(10).plus(1).logBase(2).times(0.01).plus(1).pow(2),
+		cadaverGain: x.plus(10).logBase(10).pow(4)
 	}
 }
 
+function tr14Eff() {
+	return ExpantaNum.pow(1.25, player.dc.cores).times(player.dc.cores.plus(1).pow(2))
+}
+
+function tr15EffBase() {
+	return new ExpantaNum(0.00)
+}
+
 function tr15Eff() {
-	let eff = ExpantaNum.pow(1.2, player.dc.cores)
-	if (eff.gte(10)) eff = eff.log10().times(10)
+	//let division = new ExpantaNum(modeActive("extreme+hikers_dream") ? "1e1200" : "1e1000")
+	//let x = player.tr.cubes.max(division).minus(division).div(division)
+	let eff = player.tr.cubes.plus(1).logBase(10).plus(1).root(2)
 	return eff
 }
+
+
 
 function tr19Eff() {
 	if (!modeActive("extreme")) return new ExpantaNum(1)

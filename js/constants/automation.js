@@ -50,7 +50,7 @@ const AUTOMATORS = {
 		return player.tr.upgrades.includes(21) && modeActive("extreme");
 	},
 	pathogens: function () {
-		return tmp.inf.upgs.has("3;4")||tmp.elm.bos.hasHiggs("0;0;0");
+		return tmp.inf.upgs.has("3;3")||tmp.elm.bos.hasHiggs("0;0;0");
 	},
 	cores: function () {
 		return tmp.inf.upgs.has("4;2")||tmp.elm.bos.hasHiggs("0;0;0");

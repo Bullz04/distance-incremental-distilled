@@ -5,7 +5,7 @@ function ach25Eff() {
 function ach46Eff(type) {
 	if (type == "intelligence" || type == "Intelligence" || type == "Int") {
 		return EN.logBase(player.automation.scraps.plus(3), 3).pow(1.25)
-	} else if (type == "Max Velocity" || type == "max velocity" || type == "maxvel" || type == "Vmax") {
+	} else if (type == "Max Velocity" || type == "max velocity" || type == "maxvel" || type == "Vmax" || type == "maxVel") {
 		return player.automation.scraps.times(1/100).plus(1).pow(3)
 	}
 }
@@ -21,6 +21,7 @@ function ach63Pow() {
 	if (tmp.ach) if (tmp.ach[74].has) pow = pow.times(1.25)
 	if (modeActive("easy")) pow = pow.times(1.25)
 	if (player.tr.upgrades.includes(24) && !HCCBA("noTRU") && modeActive("extreme")) pow = pow.times(1.75)
+	if (player.rank.gte(rankRewardReq[32])) pow = pow.times(getRankEffects("33"))
 	return pow
 }
 
@@ -31,6 +32,11 @@ function ach63Eff() {
 		? EN.pow(EN.logBase(tmp.timeSpeed.plus(1), 10).root(6), 10).pow(pow).root(4)
 		: new ExpantaNum(1)
 	if (player.elementary.sky.unl && tmp.elm) eff = eff.pow(tmp.elm.sky.pionEff[9])
+	return eff
+}
+
+function ach75Eff() {
+	let eff = ExpantaNum.logBase(player.dc.fluid.plus(10), 10).pow(2)
 	return eff
 }
 

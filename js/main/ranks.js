@@ -10,16 +10,20 @@ for (let i = 0; i < Object.keys(RANK_DESCS).length; i++) {
 	for (let i = 0; i < rankRewardDesc.length; i++) {
 		console.log((i+1) + ". Rank " + showNum(rankRewardReq[i]) + ": " + rankRewardDesc[i])
 	}
-})()
+})()/**/
 
 function updateTempRanks() {
 	if (!tmp.ranks) tmp.ranks = {};
 	let fp = getRankFP()
 	let bc = getRankBaseCost()
+	let discount = getRankReqDiscount()
 	tmp.ranks.req = new ExpantaNum(bc).times(
 		ExpantaNum.pow(2, player.rank.div(fp).plus(1).max(1).sub(1).pow(2))
-	);
-	tmp.ranks.bulk = player.distance.div(bc).max(1).logBase(2).sqrt().plus(1).times(fp).plus(1).round();
+	).div(discount);
+	tmp.ranks.bulk = ExpantaNum.logBase(
+		player.distance.times(discount).div(bc).max(1),
+		2
+	).root(2).times(fp).plus(1).floor();
 	/**
 	{
 	if (scalingActive("rank", player.rank.max(tmp.ranks.bulk), "scaled")) {
@@ -179,12 +183,6 @@ function updateTempRanks() {
 			.floor();
 	}
 	}*/
-
-	/*tmp.ranks.desc = player.rank.lt(Number.MAX_VALUE)
-		? RANK_DESCS[player.rank.toNumber()]
-			? RANK_DESCS[player.rank.toNumber()]
-			: DEFAULT_RANK_DESC
-		: DEFAULT_RANK_DESC;*/
 	
 	let reachedRewards = () => {
 		let num = 0
@@ -220,10 +218,15 @@ function updateTempRanks() {
 
 function getRankFP() {
 	let fp = new ExpantaNum(1);
-	if (player.tier.gt(0)) fp = fp.times(1.15)
-	if (player.tier.gt(2)) fp = fp.times(tier2Eff())
+
+	if (player.tier.gte(tierRewardReq[0])) fp = fp.times(getTierEffects("1"))
+	if (player.tier.gte(tierRewardReq[2])) fp = fp.times(getTierEffects("3"))
+
 	if (tmp.ach) if (tmp.ach[43].has) fp = fp.times(1.025)
 	if (player.tr.upgrades.includes(3) && !HCCBA("noTRU")) fp = fp.times(1.1)
+
+	if (player.collapse && player.collapse.crematorium.unl) fp = fp.times(getRepCrUpgEffects("6"))
+
 	if (tmp.rankCheap && modeActive("extreme")) fp = fp.times(getRankCheapEff())
 	return fp
 }
@@ -236,6 +239,37 @@ function getRankBaseCost() {
 	if (tmp.rankCheap && modeActive("extreme")) bc = bc.div(tmp.rankCheap.eff2).max(1e-100)
 	return bc
 }
+
+function getRankReqDiscount() {
+	let disc = new ExpantaNum(1)
+	if (player.dc.unl && tmp.dc) disc = disc.times(tmp.dc.dfEff)
+	return disc
+}
+
+function getRankEffPower(key) {
+	switch (key) {
+		case "3": {
+			let pow = new EN(1)
+			if (tmp.ach) if (tmp.ach[25].has) pow = pow.times(ach25Eff())
+			if (player.rank.gte(rankRewardReq[9])) pow = pow.times(getRankEffects("10"));
+			if (tmp.pathogens && player.pathogens.unl) pow = pow.times(tmp.pathogens[9].eff())
+			return pow
+		}
+		case "12": {
+			let pow = new EN(1)
+			if (player.rank.gte(rankRewardReq[31])) pow = pow.times(getRankEffects("32"))
+			return pow
+		}		
+		case "14": {
+			let pow = new EN(1)
+			if (player.rank.gte(rankRewardReq[31])) pow = pow.times(getRankEffects("32"))
+			return pow
+		}
+		default:
+			return new ExpantaNum(1)
+	}
+}
+
 function getRankEffBases(a) {
 	switch (a+"") {
 		case "2": {
@@ -244,8 +278,11 @@ function getRankEffBases(a) {
 			if (player.tr.upgrades.includes(6) && !HCCBA("noTRU")) base = base.times(tr6Eff());
 			return base
 		}
-		case "4":
-			return new EN(3)
+		case "4": {
+			let eff = new EN(3)
+			return eff
+		}
+			
 		case "5": {
 			let base = new EN(1.975)
 			if (player.rank.gte(rankRewardReq[8])) base = base.times(getRankEffects("9"))
@@ -264,8 +301,7 @@ function getRankEffects(a) {
 			return ExpantaNum.pow(getRankEffBases("2"), player.rank)
 		case "3": {
 			let eff = EN.logBase(player.distance.plus(10), 10).pow(2)
-			if (tmp.ach) if (tmp.ach[25].has) eff = eff.pow(ach25Eff())
-			if (player.rank.gte(rankRewardReq[9])) eff = eff.pow(getRankEffects("10"));
+			eff = eff.pow(getRankEffPower("3"))
 			return eff
 		}
 		case "4":
@@ -284,12 +320,18 @@ function getRankEffects(a) {
 			return player.tier.times(0.25).plus(1)
 		case "11":
 			return new ExpantaNum(4)
-		case "12":
-			return ExpantaNum.logBase(player.distance.plus(10), 10).root(4)
+		case "12": {
+			let eff = ExpantaNum.logBase(player.distance.plus(10), 10).root(4)
+			eff = eff.pow(getRankEffPower("12"))
+			return eff
+		}
 		case "13":
 			return new ExpantaNum(2)
-		case "14":
-			return EN.logBase(player.distance.plus(10), 10).root(3)
+		case "14": {
+			let eff = EN.logBase(player.distance.plus(10), 10).root(3)
+			eff = eff.pow(getRankEffPower("14"))
+			return eff
+		}
 		case "15":
 			return new ExpantaNum(10)
 		case "16":
@@ -334,6 +376,47 @@ function getRankEffects(a) {
 		case "31": {
 			let p = player.pathogens.amount
 			return p.plus(10).logBase(10).pow(2)
+		}
+		case "32": {
+			let eff = player.distance
+			for (let i = 0; i < 2; i++) eff = ExpantaNum.logBase(eff.plus(1), 10)
+			eff = eff.times(1.3).plus(1)
+			return eff
+		}
+		case "33": {
+			let eff = ExpantaNum.logBase(ExpantaNum.logBase(player.tr.cubes.plus(1), 10).plus(1), 10)
+				.times(0.5).plus(1)
+			return eff
+		}
+		case "34": {
+			let eff = player.collapse.lifeEssence
+			for (let i = 0; i < 2; i++) eff = ExpantaNum.logBase(eff.plus(1), 10)
+			eff = eff.times(0.05).plus(1).pow(1.3)
+			return eff
+		}
+		case "35": {
+			let r = player.rockets
+			let eff = ExpantaNum.logBase(r.plus(10), 10).pow(2)
+			return eff
+		}
+		case "36": {
+			let eff = ExpantaNum.logBase(player.collapse.crematorium.ash.plus(10), 10)
+			return eff
+		}
+		case "37":
+			return new ExpantaNum(1.1)
+		case "38":	{
+			let eff = ExpantaNum.logBase(player.distance.plus(2), 2)
+			return eff
+		}
+		case "39": {
+			let eff = ExpantaNum.logBase(player.distance.plus(1), 10).plus(1).root(2)
+			return eff
+		}
+		case "40": {
+			let eff = ExpantaNum.logBase(ExpantaNum.logBase(player.distance.plus(1), 10).plus(1), 10)
+				.times(0.025).plus(1)
+			return eff
 		}
 		
 		default:

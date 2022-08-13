@@ -74,7 +74,7 @@ class Achievement {
 	grant() {
 		if (!player.achievements.includes(this.name) && getAllAchievements().includes(this.name)) {
 			player.achievements.push(this.name);
-			notifier.success("Achievement gotten: " + ACH_DATA.names[this.name]);
+			notifier.success("Achievement " + this.name + " gotten: " + ACH_DATA.names[this.name]);
 		}
 	}
 

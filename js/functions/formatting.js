@@ -18,13 +18,14 @@ function disp(val, places, locs, base) {
 	return s;
 }
 
-function showNum(val) {
+function showNum(val, sf) {
 	val = new ExpantaNum(val);
+	significantFigures = ((sf !== undefined) ? sf : player.options.sf - 1)
 	if (val.eq(NaN)) return "NaN";
 	if (val.gte(1/0)) return "Infinity";
 	if (val.eq(0)) return "0";
 	if (val.sign == -1) return "-" + showNum(val.abs());
-	return notations[player.options.not](new ExpantaNum(val), player.options.sf - 1, 2);
+	return notations[player.options.not](new ExpantaNum(val), significantFigures, 2);
 }
 
 function addZeroes(orig, num, digits, roundWhole=false) {
@@ -111,7 +112,16 @@ function formatTime(x) {
 function formatGain(amt, gain, name, isDist, gainNotIncluded) {
 	let trueGain = ExpantaNum.mul(name?adjustGen(gain, name):gain, gainNotIncluded||1)
 	let func = isDist?formatDistance:showNum
-	if (trueGain.gte(1e100) && trueGain.gt(amt)) return "(+"+showNum(trueGain.max(1).log10().sub(amt.max(1).log10().max(1)).times(50/VIS_UPDS[player.options.visUpd]))+" OoMs/sec)"
+	if (trueGain.gte(1e100) && trueGain.gt(amt)) {
+		return "(+"
+		+ showNum(
+			trueGain.max(1).log10()
+			.sub(amt.max(1).log10().max(1))
+			//.times(50/VIS_UPDS[player.options.visUpd])
+		)
+		+ " OoMs/sec)"
+
+	}
 	else return "(+"+func(trueGain)+"/sec)"
 }
 

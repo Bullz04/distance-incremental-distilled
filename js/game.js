@@ -2,6 +2,8 @@
 
 var player = transformToEN(DEFAULT_START, DEFAULT_START);
 var loaded = false;
+var fps = 0;
+var gamePaused = false;
 var interval;
 var intervalPerSec;
 var autoTimes = {};
@@ -16,6 +18,7 @@ var saveTimer = 0;
 var showContainer = true;
 var infActive = false;
 var fnTab = "nfn";
+var collapseTab = "cadavers";
 var infTab = "infinity";
 var elmTab = "fermions";
 var bosTab = "gauge";
@@ -25,6 +28,7 @@ var skyTab = "skyrmions";
 var mltTab = "mltMap";
 var statTab = "mainStats";
 var statScalingsShown = false;
+var infSel = "";
 var pionSel = 0;
 var spinorSel = 0;
 var mltSelected = "NONE";
@@ -57,15 +61,16 @@ function tickWithoutTS(diff) {
 		player.collapse.cadavers = player.collapse.cadavers.plus(tmp.collapse.layer.gain.times(diff));
 	else if (tmp.inf.upgs.has("2;4") && !nerfActive("noCadavers"))
 		player.collapse.cadavers = player.collapse.cadavers.plus(tmp.collapse.layer.gain.times(diff.div(100)));
-	if (tmp.ach[97].has && !nerfActive("noLifeEssence"))
+	if (tmp.ach[97].has && !nerfActive("noLifeEssence")) {
 		player.collapse.lifeEssence = player.collapse.lifeEssence.plus(
 			player.collapse.cadavers.times(tmp.collapse.sacEff).max(1).times(diff)
 		);
-	else if (tmp.inf.upgs.has("5;3") && !nerfActive("noLifeEssence"))
+	} else if (tmp.inf.upgs.has("5;3") && !nerfActive("noLifeEssence")) {
 		player.collapse.lifeEssence = player.collapse.lifeEssence.plus(
 			player.collapse.cadavers.times(tmp.collapse.sacEff).max(1).times(diff.div(10))
 		);
-
+	}
+	crematoriumTick(diff)
 	if (player.pathogens.unl)
 		player.pathogens.amount = player.pathogens.amount.plus(
 			adjustGen(tmp.pathogens.gain, "pathogens").times(diff)
@@ -133,4 +138,8 @@ function gameLoop(diff) {
 		updating = false
 		needUpdate = false
 	}
+}
+
+function playDI() {
+	location.href = "main.html"
 }

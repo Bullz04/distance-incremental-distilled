@@ -3,7 +3,8 @@ function loadGame() {
 	loaded = true;
 	if (!((ls || "x") == "x")) {
 		let data = JSON.parse(atob(ls));
-		player = transformToEN(data, DEFAULT_START);
+		let transformedData = transformToEN(data, DEFAULT_START)
+		player = transformedData
 		player.tab = DEFAULT_START.tab;
 		player.optionsTab = DEFAULT_START.optionsTab;
 	}
@@ -52,11 +53,21 @@ function loadGame() {
 	completedModeCombos = completedModeCombos.filter((x,i) => i==completedModeCombos.indexOf(x));
 	interval = setInterval(function () {
 		simulateTime();
-	}, 50);
+	}, 10);
 	intervalPerSec = setInterval(function () {
 		autoPerSec();
 		updateHTMLPerSec();
 	}, 1000);
+
+	tmp.el.loading.changeStyle("backgroundColor", "rgba(0, 0, 0, 0)")
+	tmp.el.loading.changeStyle("pointerEvents", "none")
+	tmp.el.loading.changeStyle("pointerEvents", "none")
+	tmp.el.loading.setClasses({
+		loadingDisappearing: true
+	})
+	setTimeout(function(){
+		tmp.el.loading.setDisplay(false)
+	}, 500)
 }
 
 function onVersionChange() {
@@ -64,10 +75,12 @@ function onVersionChange() {
 }
 
 function simulateTime() {
-	let time = nerfOfflineProg(new ExpantaNum(getCurrentTime()).sub(player.time!==undefined?player.time:getCurrentTime()));
+	let time = new ExpantaNum(getCurrentTime()).sub(player.time!==undefined?player.time:getCurrentTime())
+	let nerfedTime = nerfOfflineProg(time);
 	if (time.isNaN()) time = new ExpantaNum(0) 
 	player.time = getCurrentTime();
-	gameLoop(time.div(1000));
+	gameLoop(nerfedTime.div(1000).times((!gamePaused) ? 1 : 0));
+	fps = 1 / (time.div(1000).toNumber())
 }
 
 function modeLoad(resetted) {

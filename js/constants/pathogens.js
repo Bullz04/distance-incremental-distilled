@@ -3,32 +3,54 @@ const PTH_UPGS = {
 	1: {
 		start: new ExpantaNum(50),
 		inc: new ExpantaNum(2),
-		pow: new ExpantaNum(1.1),
+		pow: new ExpantaNum(0.7),
+		expBase: new ExpantaNum(5),
 		desc: () => "Power up 2nd TR Upgrade by +^" + showNum(getPathogenUpgradeBases("1"))
 	},
-	2: { start: new ExpantaNum(1000), inc: new ExpantaNum(10), pow: new ExpantaNum(1.3), desc: "Rocket gain is boosted by your Cadavers." },
-	3: { start: new ExpantaNum(1000), inc: new ExpantaNum(10), pow: new ExpantaNum(1.3), desc: "Time Cube gain is boosted by your Cadavers." },
-	4: { start: new ExpantaNum(8000), inc: new ExpantaNum(2), pow: new ExpantaNum(3), desc: "Maximum Velocity is boosted by your Pathogens." },
+	2: { start: new ExpantaNum(300), inc: new ExpantaNum(10), pow: new ExpantaNum(1.5), desc: "Rocket gain is boosted by your Cadavers." },
+	3: { start: new ExpantaNum(300), inc: new ExpantaNum(10), pow: new ExpantaNum(1.5), desc: "Time Cube gain is boosted by your Cadavers." },
+	4: { start: new ExpantaNum(8000), inc: new ExpantaNum(2), pow: new ExpantaNum(1.25), desc: "Maximum Velocity is boosted by your Pathogens." },
 	5: {
 		start: new ExpantaNum(3e4),
-		inc: new ExpantaNum(10),
-		pow: new ExpantaNum(2),
+		inc: new ExpantaNum(1.5),
+		pow: new ExpantaNum(1),
+		expBase: new ExpantaNum(10),
 		desc: () => "Boost Pathogen gain by x" + showNum(getPathogenUpgradeBases("5"))
 	},
 	6: {
 		start: new ExpantaNum(8000),
 		inc: new ExpantaNum(12),
+		pow: new ExpantaNum(1.4),
 		desc: "Life Essence boosts cadaver gain."
 	},
 	7: {
 		start: new ExpantaNum(30000),
-		inc: new ExpantaNum(3),
-		pow: new ExpantaNum(1.1),
+		inc: new ExpantaNum(1.4),
+		pow: new ExpantaNum(0.7),
+		expBase: new ExpantaNum(6),
 		desc: () => "Rocket fuel requirement scale weaker by +x" + showNum(getPathogenUpgradeBases("7"))
 	},
-	8: { start: new ExpantaNum(1e8), inc: new ExpantaNum(10), pow: new ExpantaNum(2), desc: "Pathogens boost their gain." },
-	9: { start: new ExpantaNum("e1e60000"), inc: new ExpantaNum(60), desc: "The cadaver gain softcap starts later." },
-	10: { start: new ExpantaNum("e1e80000"), inc: new ExpantaNum(80), desc: "The cadaver effect softcap starts later." },
+	8: {
+		start: new ExpantaNum(1e8),
+		inc: new ExpantaNum(2),
+		pow: new ExpantaNum(1),
+		expBase: new ExpantaNum(10),
+		desc: () => "Multiply 5th Pathogen Upgrade's base effect by +x" + showNum(getPathogenUpgradeBases("8"))
+	},
+	9: {
+		start: new ExpantaNum("1e17"),
+		inc: new ExpantaNum(2.5),
+		pow: new ExpantaNum(1),
+		expBase: new ExpantaNum(10),
+		desc: () => "Power up 3rd rank reward effect by +^" + showNum(getPathogenUpgradeBases("9"))
+	},
+	10: {
+		start: new ExpantaNum("2e20"),
+		inc: new ExpantaNum(1.15),
+		pow: new ExpantaNum(1),
+		expBase: new ExpantaNum(1e20),
+		desc: "Pathogens boost their gain"
+	},
 	11: {
 		start: new ExpantaNum(1e75),
 		inc: new ExpantaNum(1e5),

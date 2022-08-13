@@ -58,7 +58,28 @@ const DEFAULT_START = {
 	collapse: {
 		unl: false,
 		cadavers: new ExpantaNum(0),
-		lifeEssence: new ExpantaNum(0)
+		lifeEssence: new ExpantaNum(0),
+		crematorium: {
+			unl: false,
+			ash: new ExpantaNum(0),
+			cremationFuel: new ExpantaNum(0),
+			incinerator: {
+				level: new ExpantaNum(0),
+				timesProcessed: new ExpantaNum(0),
+				pendingProcess: new ExpantaNum(0)
+			},
+			upgrades: {
+				repeatable: {
+					1: new ExpantaNum(0),
+					2: new ExpantaNum(0),
+					3: new ExpantaNum(0),
+					4: new ExpantaNum(0),
+					5: new ExpantaNum(0),
+					6: new ExpantaNum(0)
+				},
+				normal : []
+			}
+		},
 	},
 	pathogens: {
 		unl: false,
@@ -94,6 +115,12 @@ const DEFAULT_START = {
 		endorsements: new ExpantaNum(0),
 		knowledge: new ExpantaNum(0),
 		upgrades: [],
+		brain: {
+			unl: false,
+			neurons: new ExpantaNum(0),
+			mindMachines: new ExpantaNum(0),
+			brainLevel: new ExpantaNum(0)
+		},
 		ascension: {
 			time: [new ExpantaNum(0), new ExpantaNum(0), new ExpantaNum(0), new ExpantaNum(0)],
 			enlightenments: [new ExpantaNum(0), new ExpantaNum(0), new ExpantaNum(0), new ExpantaNum(0)],

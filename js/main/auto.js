@@ -22,16 +22,25 @@ function updateTempAuto() {
 	}
 
 	// Robots
+	{
+		if (!tmp.rd) tmp.rd = {};
+		if (!tmp.rd.mp) tmp.rd.mp = {};
+		if (!tmp.rd.magMult) tmp.rd.magMult = {};
+		if (!tmp.rd.intMult) tmp.rd.intMult = {};
+		for (let i = 0; i < Object.keys(ROBOT_REQS).length; i++) {
+			tmp.rd.mp[Object.keys(ROBOT_REQS)[i]] = new ExpantaNum(1)
 
-	if (!tmp.rd) tmp.rd = {};
-	if (!tmp.rd.mp) tmp.rd.mp = {};
-	for (let i = 0; i < Object.keys(ROBOT_REQS).length; i++) tmp.rd.mp[Object.keys(ROBOT_REQS)[i]] = new ExpantaNum(1);
-	if (player.tr.upgrades.includes(8)&&!HCCBA("noTRU")) tmp.rd.mp.rankbot = tmp.rd.mp.rankbot.times(tr8Eff());
-	if (player.tr.upgrades.includes(9)&&!HCCBA("noTRU")) tmp.rd.mp.tierbot = tmp.rd.mp.tierbot.times(tr9Eff());
+			tmp.rd.magMult[Object.keys(ROBOT_REQS)[i]] = new ExpantaNum(1)
+			tmp.rd.intMult[Object.keys(ROBOT_REQS)[i]] = new ExpantaNum(1)
+		}
+	}
+
+	//if (player.tr.upgrades.includes(9) && !HCCBA("noTRU")) tmp.rd.intMult.rankbot = tmp.rd.intMult.rankbot.times(tr9Eff());
+	
 	if (player.tr.upgrades.includes(19) && modeActive("extreme") && !HCCBA("noTRU"))
 		tmp.rd.mp.rankCheapbot = tmp.rd.mp.rankCheapbot.times(tr19Eff());
 }
-
+//console.log(tmp.rd.intMult.rankbot)
 function getScrapGain() {
 	let gain = player.distance.plus(1).pow(2).times(player.velocity.plus(1)).log10().div(100);
 	if (player.rank.gte(rankRewardReq[17])) gain = gain.times(getRankEffects("18"));
@@ -49,14 +58,14 @@ function getIntelligenceGain() {
 	if (player.rank.gte(rankRewardReq[12])) gain = gain.times(getRankEffects("13"));
 	if (player.rank.gte(rankRewardReq[15])) gain = gain.times(getRankEffects("16"));
 	if (player.rank.gte(rankRewardReq[28])) gain = gain.times(getRankEffects("29"))
-	if (player.tier.gt(4)) gain = gain.times(2);
-	if (player.tier.gt(12)) gain = gain.times(3);
-	if (player.tier.gt(13)) gain = gain.times(4);
+
+	if (player.tier.gte(tierRewardReq[4])) gain = gain.times(getTierEffects("5"))
+
 	if (tmp.ach[36].has) gain = gain.times(1.5);
 	if (tmp.ach) if (tmp.ach[46].has) gain = gain.times(ach46Eff("Intelligence"))
 	
 	
-	if (player.tr.upgrades.includes(6) && !HCCBA("noTRU")) gain = gain.times(tr6Eff());
+	if (player.tr.upgrades.includes(9) && !HCCBA("noTRU")) gain = gain.times(tr9Eff()["intelligenceGain"]);
 	if (modeActive("hard")) gain = gain.div(2)
 	if (modeActive("easy")) gain = gain.times(1.6)
 	return gain

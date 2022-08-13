@@ -56,16 +56,17 @@ function setupHTML() {
 		table += "<div id='rankReward"+ (i+1) +"' class='rtReward'>"
 		table += "<span id=\"rankDesc" + (i+1) + "\"></span>"
 			
-		if (i == 9 || i == 21) table += "<br>Currently: ^<b><span id='rankEff"+(i+1)+"'></span></b>"
+		if ([9, 21, 29, 31, 32, 36, 39].includes(i)) table += "<br>Currently: ^<b><span id='rankEff"+(i+1)+"'></span></b>"
 		else table += "<br>Currently: x<b><span id='rankEff"+(i+1)+"'></span></b>"
 		table += "</div>"
 	}
 	table += "</div><div class='flexContainer'>"
 	for (let i=0;i<Object.keys(TIER_DESCS).length;i++) {
 		let tiers = Object.keys(TIER_DESCS)[i]
-		table += "<div id='tierReward"+tiers+"' class='rtReward'>"
-		table += "Tier "+showNum(parseInt(tiers))+": "+(TIER_DESCS[tiers][0].toUpperCase() + TIER_DESCS[tiers].slice(1))
-		if (window["tier"+tiers+"Eff"]) table += "<br>Currently: x<b><span id='tierEff"+tiers+"'></span></b>"
+		table += "<div id='tierReward"+ (i+1) +"' class='rtReward'>"
+		table += "<span id=\"tierDesc"+ (i+1) +"\"></span>"
+
+		table += "<br>Currently: x<b><span id='tierEff"+(i+1)+"'></span></b>"
 		table += "</div>"
 	}
 	table += "</div></div>"
@@ -84,7 +85,7 @@ function setupHTML() {
 				id +
 				"' class='btn locked' onclick='buyTRUpg(" +
 				id +
-				")' style='height: 140px;'></button></td>";
+				")' style='height: 140px; width: 240px;'></button></td>";
 			table += "</td>";
 		}
 		table += "</tr>";
@@ -103,6 +104,27 @@ function setupHTML() {
 		table += "</tr>";
 	}
 	cmTable.setHTML(table);
+	//Repeatable Crematorium Upgrade Table
+	let repCrUpgTable = new Element("RCrUpgTable")
+	table = ""
+	table += "<table><tr>"
+	for (let r = 0; r < Math.ceil(RCRU_AMT); r++) {
+		if ( r != 0 && ((r)%3) == 0 ) table += "</tr></table><table><tr>"
+		table += "<td><button id=\"repCrUpg" + (r+1) + "\" class=\"btn crematorium\" style=\"height: 160px; width: 210px; max-width: none;\" onclick=\"tmp.collapse.crematorium.upgBuy(" + (r+1) + ", false)\"></button></td>"
+	}
+	table += "</tr></table>"
+	repCrUpgTable.setHTML(table)
+
+	// Normal Crematorium Upgrade Table
+	let normCrUpgTable = new Element("NCrUpgTable")
+	table = ""
+	table += "<table><tr>"//NCRU_AMT
+	for (let r = 0; r < Math.ceil(NCRU_AMT); r++) {
+		if ( r != 0 && ((r)%4) == 0 ) table += "</tr></table><table><tr>"
+		table += "<td><button id=\"normalCrUpg" + (r+1) + "\" class=\"btn crematorium\" style=\"height: 150px; width: 210px; max-width: none;\" onclick=\"buyNormCrUpg(" + (r+1) + ")\"></button></td>"
+	}
+	table += "</tr></table>"
+	normCrUpgTable.setHTML(table)
 
 	// Pathogen Upgrade Pyramid
 	let pthUpgs = new Element("pthUpgs");
@@ -293,7 +315,7 @@ function setupHTML() {
 	
 	// Main Link
 	let span = new Element("linkToGame")
-	span.setHTML((betaID==""&&!window.location.href.includes(correctLink))?"Please migrate to <a href='http://"+correctLink+"/DistInc.github.io/main.html'>"+correctLink+"</a><br>":"")
+	span.setHTML((betaID==""&&!window.location.href.includes(correctLink))?"Original game is at <a href='http://"+correctLink+"/DistInc.github.io/main.html'>"+correctLink+"</a><br>":"")
 	
 	// Element Setup
 	tmp.el = {}
@@ -301,6 +323,13 @@ function setupHTML() {
 	for (let i=0;i<all.length;i++) {
 		let x = all[i]
 		tmp.el[x.id] = new Element(x)
+	}
+}
+
+function updateAllElementHTML(thing, innerHTML) {
+	let x = document.querySelectorAll(thing)
+	for (let i = 0; i < x.length; i++) {
+		x[i].innerHTML = innerHTML
 	}
 }
 
@@ -321,15 +350,15 @@ function updateAfterTick() {
 		saveTimer = 0;
 	}
 	if (modeActive("absurd") && !reloaded) {
-		const bufhiesibvfib = document.body.querySelectorAll(".tab, #mainContainer");
-		for (const i in bufhiesibvfib)
-			if (bufhiesibvfib[i].style !== undefined) {
-				let t = `rotate(${Math.random() * 360}deg) `;
-				t += "skew(" + Math.random() * 75 + "deg) ";
-				let scale = (Math.random() * 3) ** 2 / 9;
+		const NO_MORE_MOVES = document.body.querySelectorAll(".tab, #mainContainer");
+		for (const i in NO_MORE_MOVES)
+			if (NO_MORE_MOVES[i].style !== undefined) {
+				let t = `rotate(${ Math.random() * 0}deg) `;
+				t += "skew(" + (-2.5) + "deg) ";
+				let scale = 0.9 + Math.random() * 0.1;
 				if (scale<0.1) scale = 0.1;
 				t += "scale(" + scale + ") ";
-				bufhiesibvfib[i].style.transform = t;
+				NO_MORE_MOVES[i].style.transform = t;
 			}
 	}
 	updateTabs();
@@ -342,8 +371,10 @@ function updateUnlocks() {
 	if (player.distance.gte(new ExpantaNum(TR_UNL))) player.tr.unl = true;
 	if (player.distance.gte(ExpantaNum.mul(COLLAPSE_UNL, tmp.collapse.lrm))) player.collapse.unl = true;
 	if (player.collapse.cadavers.gte(ExpantaNum.mul(PATHOGENS_UNL, tmp.pathogens.lrm))) player.pathogens.unl = true;
+	if (player.collapse.cadavers.gte(ExpantaNum.mul(CREMATORIUM_UNL, tmp.collapse.crematorium.lrm))) player.collapse.crematorium.unl = true;
 	if (player.distance.gte(ExpantaNum.mul(DC_UNL, tmp.dc.lrm))) player.dc.unl = true;
 	if (tmp.inf.can && !infActive && player.inf.endorsements.lt(10) && !(tmp.ach[178].has&&tmp.elm.bos.hasHiggs("2;0;0"))) tmp.inf.forceReset();
+	if (player.inf.endorsements.gte(8)) player.inf.brain.unl = true
 	if (player.distance.gte(ExpantaNum.mul(DISTANCES.uni, "1e90000"))) player.inf.derivatives.unl = true;
 	if (!mltActive(1)) {
 		if ((player.distance.gte(THEORY_REQ[0]) && player.bestEP.gte(THEORY_REQ[1])) || player.elementary.theory.unl) player.elementary.theory.unl = true;
