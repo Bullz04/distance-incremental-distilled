@@ -113,7 +113,7 @@ function updateOptionsHTML(){
 
 function updatePreRanksHTML(){
 	tmp.el["Ach25RewardEff"].setHTML(
-		(tmp.ach[25].has) ? "Achievement 25 reward: ^" + showNum(ach25Eff()) + " rank 4 reward<br>" : ""
+		(tmp.ach[25].has) ? "Achievement 25 reward: ^" + showNum(ach25Eff()) + " 3rd rank reward<br>" : ""
 	)
 	tmp.el["Ach46RewardEffMaxVel"].setHTML(
 		(tmp.ach[46].has) ? "Achievement 46 reward: x" + showNum(ach46Eff("Max Velocity")) + " maximum velocity<br>" : ""
@@ -136,6 +136,9 @@ function updateRanksHTML(){
 	tmp.el.rankDesc.setTxt(tmp.ranks.desc);
 	tmp.el.rankReq.setTxt(formatDistance(tmp.ranks.req));
 	tmp.el.rankName.setTxt("Rank");
+	tmp.el.rankFP.setHTML(
+		(getRankFP().gt(1)) ? "FP: " + showNum(getRankFP().times(100)) + "%<br>" : ""
+	)
 }
 
 function updateTiersHTML(){
@@ -144,6 +147,9 @@ function updateTiersHTML(){
 	tmp.el.tierDesc.setTxt(tmp.tiers.desc);
 	tmp.el.tierReq.setTxt(showNum(tmp.tiers.req.ceil()));
 	tmp.el.tierName.setTxt("Tier");
+	tmp.el.tierFP.setHTML(
+		(getTierFP().gt(1)) ? "FP: " + showNum(getTierFP().times(100)) + "%<br>" : ""
+	)
 }
 
 function updateMainHTML(){
@@ -227,10 +233,10 @@ function updateRobotsHTML(){
 		showNum(player.automation.scraps) +
 			" scraps " + formatGain(player.automation.scraps, getScrapGain().times(nerfActive("noTS") ? 1 : tmp.timeSpeed), "scraps")
 	);
-	tmp.el.intAmt.setTxt(
+	updateAllElementHTML("#intelligenceAmt",
 		showNum(player.automation.intelligence) +
 			" intelligence " + formatGain(player.automation.intelligence, getIntelligenceGain().times(nerfActive("noTS") ? 1 : tmp.timeSpeed), "intel")
-	);
+	)
 	for (let i = 0; i < Object.keys(ROBOT_REQS).length; i++) {
 		tmp.el[Object.keys(ROBOT_REQS)[i]].setTxt(tmp.auto[Object.keys(ROBOT_REQS)[i]].btnTxt);
 		tmp.el[Object.keys(ROBOT_REQS)[i]].setClasses({
@@ -307,7 +313,7 @@ function updateTimeReversalHTML(){
 		tmp.el.frf.setTxt(showNum(tmp.tr.eff));
 		for (let i = 1; i <= TR_UPG_AMT; i++) {
 			let upg = TR_UPGS[i];
-			let desc = upg.desc;
+			let desc = (typeof upg.desc == "function") ? upg.desc() : upg.desc;
 			let effDisp = ""
 			if (!tr2Pow().eq(1) && i == 2) desc += "<span class='grossminitxt'>(^" + showNum(tr2Pow()) + ")</span>";
 			if (!tr11Pow().eq(1) && i == 11)
@@ -329,41 +335,130 @@ function updateTimeReversalHTML(){
 	}
 }
 
-function updateCollpaseHTML(){
+function updateCrematoriumUpgrades() {
+	//Repeatables
+	for (i = 1; i <= RCRU_AMT; i++) {
+		let mainDesc = REPEATABLE_CREMATORIUM_UPGRADES[i].desc
+		let pow = ""
+		if (!getRepCrUpgEffPower(i).eq(1)) pow += " (^" + showNum(getRepCrUpgEffPower(i)) + ")"
+		tmp.el["repCrUpg" + i].setHTML(
+			( (getRepCrUpgFP(i+"").gt(1)) ? "<span class=\"fpText\" style=\"font-size: 12px;\">FP: " + showNum(getRepCrUpgFP(i+"").times(100)) + "%</span><br>" : "") +
+			"<span class='upgradeTitle' style=\"font-size: 15px;\">" + REPEATABLE_CREMATORIUM_UPGRADES[i].name + "</span>" +
+			"<br>" + ((typeof mainDesc == "function") ? mainDesc() : mainDesc) + pow +
+			"<br>Level: " + showNum(player.collapse.crematorium.upgrades.repeatable[i].floor()) +
+			"<br>Currently: x" + showNum(getRepCrUpgEffects(i)) +
+			"<br>Cost: " + showNum(getRepCrUpgData(i).cost) + " ashes"
+		)
+	}
+	for (i = 1; i <= NCRU_AMT; i++) {
+		let ncru = NORMAL_CREMATORIUM_UPGRADES[i]
+		let mainDesc = NORMAL_CREMATORIUM_UPGRADES[i].desc
+		let effectDisplay = ((ncru.effDisp) ? "<br>" + ncru.effDisp() : "")
+		let pow = ""
+		if (!getNormCrUpgEffPower(i).eq(1)) pow += " (^" + showNum(getNormCrUpgEffPower(i)) + ")"
+		tmp.el["normalCrUpg" + i].setHTML(
+			((typeof mainDesc == "function") ? mainDesc() : mainDesc) + pow +
+			effectDisplay +
+			"<br>Cost: " + showNum(ncru.cost()) + " ashes"
+		)
+		tmp.el["normalCrUpg" + i].setClasses({
+			btn: true,
+			locked: player.collapse.crematorium.ash.lt(ncru.cost()) && !hasNormCrUpg(i),
+			crematorium: player.collapse.crematorium.ash.gte(ncru.cost()) && !hasNormCrUpg(i),
+			bought: hasNormCrUpg(i)
+		});
+	}
+}	
+
+function updateCollapseHTML() {
 	if (player.tab == "collapse") {
-		tmp.el.collapseReset.setClasses({ btn: true, locked: !tmp.collapse.can, btndd: tmp.collapse.can });
-		tmp.el.cadaverGain.setTxt(showNum(tmp.collapse.layer.gain));
-		tmp.el.cadavers.setHTML(
+		updateCollapseTabs()
+		updateAllElementHTML("#cadaverAmt",
 			"<span class='dead'>" +
 				showNum(player.collapse.cadavers) +
 				"</span> cadavers<span class='dead'> " +
 				(((tmp.ach[96].has||tmp.inf.upgs.has("2;4"))&&!nerfActive("noCadavers"))?(formatGain(player.collapse.cadavers, tmp.collapse.layer.gain.div(tmp.ach[96].has?1:100))):"")+
 				"</span>"
-		);
-		tmp.el.cadaverEff.setTxt(showNum(getCadaverEff()));
-		tmp.el.sacrificeCadavers.setClasses({
-			btn: true,
-			locked: player.collapse.cadavers.eq(0),
-			btndd: player.collapse.cadavers.gt(0)
-		});
-		tmp.el.lifeEssence.setHTML(
-			"<span class='alive'>" +
-				showNum(player.collapse.lifeEssence) +
-				"</span> life essence <span class='alive'>" +
-				(((tmp.ach[97].has||tmp.inf.upgs.has("5;3"))&&!nerfActive("noLifeEssence"))?formatGain(player.collapse.lifeEssence, player.collapse.cadavers.times(tmp.collapse.sacEff).max(1).div(tmp.ach[97].has?1:100)):"")+"</span>"
-		);
-		for (let i = 1; i <= EM_AMT; i++) {
-			let ms = ESSENCE_MILESTONES[i];
-			tmp.el["lem" + i].setHTML(ms.desc + "<br>Req: " + showNum(ms.req) + " Life Essence.");
-			if (ms.disp !== undefined) tmp.el["lem" + i].setTooltip("Currently: " + ms.disp());
-			tmp.el["lem" + i].setClasses({ msCont: true, r: !hasCollapseMilestone(i) });
+		)
+		updateAllElementHTML("#cremationFuelAmt",
+			"<span class='dead'>" +
+				showNum(player.collapse.crematorium.cremationFuel) +
+				"</span> cremation fuel<span class='dead'> " +
+				formatGain(player.collapse.crematorium.ash, getCremationFuelGain()) + "</span>"
+		)
+		updateAllElementHTML("#cremAshAmt",
+			"<span class='dead'>" +
+				showNum(player.collapse.crematorium.ash) +
+				"</span> ashes"
+		)
+		if (collapseTab == "cadavers") {
+			tmp.el.collapseReset.setClasses({ btn: true, locked: !tmp.collapse.can, btndd: tmp.collapse.can });
+			tmp.el.cadaverGain.setTxt(showNum(tmp.collapse.layer.gain));
+			tmp.el.cadaverEff.setTxt(showNum(getCadaverEff()));
+			tmp.el.sacrificeCadavers.setClasses({
+				btn: true,
+				locked: player.collapse.cadavers.eq(0),
+				btndd: player.collapse.cadavers.gt(0)
+			});
+			tmp.el.lifeEssence.setHTML(
+				"<span class='alive'>" +
+					showNum(player.collapse.lifeEssence) +
+					"</span> life essence <span class='alive'>" +
+					(((tmp.ach[97].has||tmp.inf.upgs.has("5;3"))&&!nerfActive("noLifeEssence"))?formatGain(player.collapse.lifeEssence, player.collapse.cadavers.times(tmp.collapse.sacEff).max(1).div(tmp.ach[97].has?1:100)):"")+"</span>"
+			);
+			for (let i = 1; i <= EM_AMT; i++) {
+				let ms = ESSENCE_MILESTONES[i];
+				tmp.el["lem" + i].setHTML(ms.desc + "<br>Req: " + showNum(ms.req) + " Life Essence.");
+				if (ms.disp !== undefined) tmp.el["lem" + i].setTooltip("Currently: " + ms.disp());
+				tmp.el["lem" + i].setClasses({ msCont: true, r: !hasCollapseMilestone(i) });
+			}
+		}
+		if (collapseTab == "crematorium") {
+			tmp.el.incineratorSpeed.setHTML(showNum(getIncineratorSpeed()))
+			tmp.el.incineratorBulkCap.setHTML(showNum(getIncineratorBulkCap()))
+			tmp.el.pendingProcessesLeft.setHTML(showNum(player.collapse.crematorium.incinerator.pendingProcess))
+			tmp.el.incineratorProgress.setHTML(showNum(player.collapse.crematorium.incinerator.timesProcessed.times(100)) + "%")
+			tmp.el["CremAshEffCadavers"].setHTML(showNum(getAshEffect().cadavers))
+			tmp.el["CremAshEffCremFuel"].setHTML(showNum(getAshEffect().cremationFuel))
+			tmp.el.cremFurnaceText.setHTML("Burn " +
+				showNum(getIncineratorMinBulk().max(1).times(tmp.collapse.crematorium.incinerator.cadaverReq)) + " cadavers and " +
+				showNum(getIncineratorMinBulk().max(1).times(tmp.collapse.crematorium.incinerator.cremationFuelReq)) + " cremation fuel to add " +
+				showNum(getIncineratorMinBulk().max(1)) + "</span> processes"
+			)
+			tmp.el["repCrUpgMaxAll"].setDisplay(!repCrUpgConsumeAshes())
+			updateCrematoriumUpgrades()
 		}
 	}
 }
 
-function upadtePathogenUpgradesHTML(){
+function upadtePathogenUpgradesHTML() {
 	for (let i = 1; i <= PTH_AMT; i++) {
 		let hidden = PTH_UPGS[i].unl ? !PTH_UPGS[i].unl() : false;
+		let effBuffPlusMulti = ""
+		let effBuffPlusPow = ""
+		let effBuffMultiPow = ""
+		let pathogenUpgradeFP = ""
+
+		let getUpgPlusMulti = function(i) {
+			return getPathogenUpgPlusMulti(i).times(tmp.pathogens.upgPow)
+		}
+		let getUpgPlusPow = function(i) {
+			return getPathogenUpgPlusPow(i)
+		}
+		if ( (i == 1 || i == 7 || i == 8 || i == 9)&& !getUpgPlusMulti(i).eq(1) ) {
+			effBuffPlusMulti += "<span class=\"grossminitxt\">(x" + showNum(getUpgPlusMulti(i)) + ")</span>"
+		} else if ( (i == 5)&& !tmp.pathogens.upgPow.eq(1) ) {
+			effBuffMultiPow += "<span class=\"grossminitxt\">(^" + showNum(tmp.pathogens.upgPow) + ")</span>"
+		}
+		if ( (i == 8)&& !getUpgPlusPow(i).eq(1) ) {
+			effBuffPlusPow += "<span class=\"grossminitxt\">(^" + showNum(getUpgPlusPow(i)) + ")</span>"
+		}
+		
+
+		if ( !getPathogenUpgFP(i).eq(1) ) {
+			pathogenUpgradeFP += "<span class=\"fpText\" style=\"font-size: 12px;\">FP: " + showNum(getPathogenUpgFP(i).times(100)) + "%</span><br>"
+		}
+
 		tmp.el["pth" + i].setDisplay(!hidden);
 		tmp.el["pth" + i].setClasses({
 			btn: true,
@@ -371,19 +466,21 @@ function upadtePathogenUpgradesHTML(){
 			gross: player.pathogens.amount.gte(tmp.pathogens[i].cost)
 		});
 		tmp.el["pth" + i].setHTML(
+			pathogenUpgradeFP +
 			((typeof PTH_UPGS[i].desc == "function") ? PTH_UPGS[i].desc() : PTH_UPGS[i].desc) +
-				"<br>" +
-				"Level: " +
-				showNum(player.pathogens.upgrades[i]) +
-				(tmp.pathogens.extra(i).gt(0) ? " + " + showNum(tmp.pathogens.extra(i)) : "") +
-				"<br>Currently: " +
-				tmp.pathogens.disp(i) +
-				(player.pathogens.upgrades[i].gte(getPathogenUpgSoftcapStart(i))
-					? "<span class='sc'>(softcapped)</span>"
-					: "") +
-				"<br>Cost: " +
-				showNum(tmp.pathogens[i].cost) +
-				" Pathogens."
+			effBuffPlusMulti + effBuffMultiPow + effBuffPlusPow +
+			"<br>" +
+			"Level: " +
+			showNum(player.pathogens.upgrades[i]) +
+			(tmp.pathogens.extra(i).gt(0) ? " + " + showNum(tmp.pathogens.extra(i)) : "") +
+			"<br>Currently: " +
+			tmp.pathogens.disp(i) +
+			(player.pathogens.upgrades[i].gte(getPathogenUpgSoftcapStart(i))
+				? "<span class='sc'>(softcapped)</span>"
+				: "") +
+			"<br>Cost: " +
+			showNum(tmp.pathogens[i].cost) +
+			" Pathogens."
 		);
 	}
 }
@@ -399,7 +496,7 @@ function upadtePathogenHTML(){
 		);
 		upadtePathogenUpgradesHTML()
 		tmp.el.pthUpgPow.setHTML(
-			!tmp.pathogens.upgPow.eq(1) ? ("Upgrade Power: " + showNum(tmp.pathogens.upgPow.times(100)) + "%"+(tmp.pathogens.upgPow.gte(10)?" <span class='sc'>(capped)</span>":"")+"<br>") : ""
+			!tmp.pathogens.upgPow.eq(1) ? ("Pathogen Upgrade Power: " + showNum(tmp.pathogens.upgPow.times(100)) + "%"+"<br>This means your levels and extra ones<br>act as they are x" + showNum(tmp.pathogens.upgPow) + " levels!<br>") : ""
 		);
 		tmp.el.tdeEff.setHTML(
 			tmp.ach[63].has
@@ -416,38 +513,40 @@ function updateSoftcapsHTML(){
 	for (let i = 0; i < Object.keys(tmp.sc).length; i++) {
 		let name = Object.keys(tmp.sc)[i];
 		let reached = Object.values(tmp.sc)[i];
-		tmp.el[name + "SC"].setHTML(reached ? "(softcapped) removed :thumbsup:" : "");
+		tmp.el[name + "SC"].setHTML(reached ? "(softcapped)" : "");
 		tmp.el[name + "SC"].setClasses({ sc: true });
 	}
 }
 
 function updateDarkCircleRssHTML(){
+	tmp.el["Ach75RewardEff"].setHTML(
+		(tmp.ach[75].has) ? "Achievement 75 reward: x" + showNum(ach75Eff()) + " dark flow<br>" : ""
+	)
 	tmp.el.darkMatter.setHTML(
 		"Dark Matter<br>Amount: " +
 			showNum(player.dc.matter) +
 			"<br>Gain: " +
 			formatGain(player.dc.matter, tmp.dc.dmGain, "dc", false, tmp.dc.flow) +
-			"<br>Effect: You gain " +
+			"<br>Effect: You gain x" +
 			showNum(tmp.dc.dmEff) +
-			"x as many Rockets."
+			" as many Rockets."
 	);
 	tmp.el.darkEnergy.setHTML(
 		"Dark Energy<br>Amount: " +
 			showNum(player.dc.energy) +
 			"<br>Gain: " +
 			formatGain(player.dc.energy, tmp.dc.deGain, "dc", false, tmp.dc.flow) +
-			"/s<br>Effect: You gain " +
+			"<br>Effect: You gain x" +
 			showNum(tmp.dc.deEff) +
-			"x as many Time Cubes."
+			" as many Time Cubes."
 	);
 	tmp.el.darkFluid.setHTML(
 		"Dark Fluid<br>Amount: " +
 			showNum(player.dc.fluid) +
 			"<br>Gain: " +
 			formatGain(player.dc.fluid, tmp.dc.dfGain, "dc", false, tmp.dc.flow) +
-			"/s<br>Effect: Scaled Rocket Fuel scaling starts " +
-			showNum(tmp.dc.dfEff) +
-			" Rocket Fuel later."
+			"<br>Effect: Cheapen rank requirement by x" +
+			showNum(tmp.dc.dfEff)
 	);
 }
 
@@ -461,9 +560,7 @@ function updateDarkCircleHTML(){
 				"<br>Cost: " +
 				showNum(tmp.dc.coreCost) +
 				" Cadavers" +
-				(tmp.dc.coreEff.gt(0)
-					? "<br>Effect: +" + showNum(tmp.dc.coreEff.times(100)) + "% Pathogen Upgrade Power"
-					: "")
+				"<br>Effect: x" + showNum(tmp.dc.coreEff) + " FP of Pathogen Upgrade 2 - 6"
 		);
 		tmp.el.darkMatter.setClasses({darkcircle: true, dcAnim: player.options.dcPulse})
 		tmp.el.darkEnergy.setClasses({darkcircle: true, dcAnim: player.options.dcPulse})
@@ -507,6 +604,7 @@ function updateInfinitySubtabHTML(){
 		tmp.el.nextEndorsement.setTxt(formatDistance(tmp.inf.req));
 		tmp.el.knowledge.setTxt(showNum(player.inf.knowledge));
 		tmp.el.knowledgeGain.setTxt(formatGain(player.inf.knowledge, tmp.inf.knowledgeGain, "knowledge"));
+		tmp.el.infUpgData.setHTML( (tmp.infSelected !== undefined) ? tmp.inf.upgs.desc(tmp.infSelected) : "" );
 		for (let r = 1; r <= INF_UPGS.rows; r++) {
 			for (let c = 1; c <= INF_UPGS.cols; c++) {
 				let state = "";
@@ -525,12 +623,22 @@ function updateInfinitySubtabHTML(){
 				});
 			}
 		}
-		tmp.el.endorsementName.setTxt(getScalingName("endorsements") + " ");
+		//tmp.el.endorsementName.setTxt(getScalingName("endorsements") + " ");
 		
 		let ach112 = ach112Eff()
 		tmp.el.tudeEff.setHTML(
 			tmp.ach[112].has ? "The Universe Doesn't Exist multiplier: " + showNum(ach112) + "x"+(ach112.gte(1e160)?" <span class='sc'>(softcapped)</span>":"")+"<br><br>" : ""
 		);
+	}
+}
+
+function updateBrainHTML() {
+	tmp.el.brainLockedText.setDisplay(!player.inf.brain.unl)
+	tmp.el.brainMainUI.setDisplay(player.inf.brain.unl)
+	if (infTab == "brain") {
+		tmp.el.mindMachines.setHTML(showNum(player.inf.brain.mindMachines))
+		tmp.el.nextMindMachine.setHTML(showNum(tmp.inf.brain.mindMachine.next))
+		tmp.el.mindMachineEffect.setHTML(showNum(getMindMachineEffect()))
 	}
 }
 
@@ -572,52 +680,17 @@ function updateAscensionHTML(){
 }
 
 function updateNormalStadiumHTML(){
-	for (let i = 0; i < Object.keys(STADIUM_DESCS).length; i++) {
-		let name = Object.keys(STADIUM_DESCS)[i];
-		tmp.el[name + "Div"].setTooltip(tmp.inf.stadium.tooltip(name));
-		tmp.el[name + "Div"].setClasses({
-			stadiumChall: true,
-			comp: player.inf.stadium.completions.includes(name)
-		});
-		let active = player.inf.stadium.current == name;
-		let trapped = !active && tmp.inf.stadium.active(name) && !modeActive("extreme");
-		let comp = player.inf.stadium.completions.includes(name);
-		tmp.el[name + "Chall"].setTxt(trapped ? "Trapped" : active ? "Active" : comp ? "Completed" : "Start");
-		tmp.el[name + "Chall"].setClasses({
-			btn: true,
-			bought: trapped || active,
-			locked: player.inf.stadium.current != "" && !(trapped || active),
-			inf: !(trapped || active || player.inf.stadium.current != "")
-		});
-		let data = mltRewardActive(1)?MLT_1_STADIUM_REWARDS:STADIUM_REWARDS
-		let showCurrent = data.effects[name] !== undefined;
-		tmp.el[name + "Btm"].setHTML(
-			"Goal: " +
-				formatDistance(tmp.inf.stadium.goal(name)) +
-				"<br>Reward: " +
-				data[name] +
-				"<br>" +
-				(showCurrent ? "Currently: " + data.disp[name]() : "")
-		);
-	}
-	tmp.el.exitStad.setDisplay(player.inf.stadium.current != "");
-	tmp.el.stadiumProg.setTxt(player.inf.stadium.current==""?"":"Progress to Completion: "+showNum(tmp.inf.stadium.progress())+"%")
-}
-
-function updateExtremeStadiumHTML(){
-	tmp.el.extremeStadDesc.setTxt(modeActive("extreme")?" in the same row":"")
-	tmp.el.extremeStadium.setDisplay(modeActive("extreme"))
-	if (modeActive("extreme")) {
-		for (let i=0;i<Object.keys(EXTREME_STADIUM_DATA).length;i++) {
-			let name = Object.keys(EXTREME_STADIUM_DATA)[i]
-			tmp.el[name+"Div"].setTooltip(extremeStadiumTooltip(name));
-			tmp.el[name+"Div"].setClasses({
+	if (infTab == "stadium") {
+		for (let i = 0; i < Object.keys(STADIUM_DESCS).length; i++) {
+			let name = Object.keys(STADIUM_DESCS)[i];
+			tmp.el[name + "Div"].setTooltip(tmp.inf.stadium.tooltip(name));
+			tmp.el[name + "Div"].setClasses({
 				stadiumChall: true,
-				comp: player.extremeStad.includes(name),
-			})
+				comp: player.inf.stadium.completions.includes(name)
+			});
 			let active = player.inf.stadium.current == name;
-			let trapped = !active && extremeStadiumActive(name);
-			let comp = player.extremeStad.includes(name);
+			let trapped = !active && tmp.inf.stadium.active(name) && !modeActive("extreme");
+			let comp = player.inf.stadium.completions.includes(name);
 			tmp.el[name + "Chall"].setTxt(trapped ? "Trapped" : active ? "Active" : comp ? "Completed" : "Start");
 			tmp.el[name + "Chall"].setClasses({
 				btn: true,
@@ -625,18 +698,57 @@ function updateExtremeStadiumHTML(){
 				locked: player.inf.stadium.current != "" && !(trapped || active),
 				inf: !(trapped || active || player.inf.stadium.current != "")
 			});
-			let showCurrent = EXTREME_STADIUM_DATA[name].effect !== undefined;
+			let data = mltRewardActive(1)?MLT_1_STADIUM_REWARDS:STADIUM_REWARDS
+			let showCurrent = data.effects[name] !== undefined;
 			tmp.el[name + "Btm"].setHTML(
 				"Goal: " +
-					formatDistance(extremeStadiumGoal(name)) + // extremeStadiumGoal
+					formatDistance(tmp.inf.stadium.goal(name)) +
 					"<br>Reward: " +
-					EXTREME_STADIUM_DATA[name].reward +
+					data[name] +
 					"<br>" +
-					(showCurrent ? "Currently: " + EXTREME_STADIUM_DATA[name].disp() : "")
+					(showCurrent ? "Currently: " + data.disp[name]() : "")
 			);
 		}
+		tmp.el.exitStad.setDisplay(player.inf.stadium.current != "");
+		tmp.el.stadiumProg.setTxt(player.inf.stadium.current==""?"":"Progress to Completion: "+showNum(tmp.inf.stadium.progress())+"%")
 	}
-	tmp.el.extremeStadReset.setDisplay(modeActive("extreme"));
+}
+
+function updateExtremeStadiumHTML(){
+	if (infTab == "stadium") {
+		tmp.el.extremeStadDesc.setTxt(modeActive("extreme")?" in the same row":"")
+		tmp.el.extremeStadium.setDisplay(modeActive("extreme"))
+		if (modeActive("extreme")) {
+			for (let i=0;i<Object.keys(EXTREME_STADIUM_DATA).length;i++) {
+				let name = Object.keys(EXTREME_STADIUM_DATA)[i]
+				tmp.el[name+"Div"].setTooltip(extremeStadiumTooltip(name));
+				tmp.el[name+"Div"].setClasses({
+					stadiumChall: true,
+					comp: player.extremeStad.includes(name),
+				})
+				let active = player.inf.stadium.current == name;
+				let trapped = !active && extremeStadiumActive(name);
+				let comp = player.extremeStad.includes(name);
+				tmp.el[name + "Chall"].setTxt(trapped ? "Trapped" : active ? "Active" : comp ? "Completed" : "Start");
+				tmp.el[name + "Chall"].setClasses({
+					btn: true,
+					bought: trapped || active,
+					locked: player.inf.stadium.current != "" && !(trapped || active),
+					inf: !(trapped || active || player.inf.stadium.current != "")
+				});
+				let showCurrent = EXTREME_STADIUM_DATA[name].effect !== undefined;
+				tmp.el[name + "Btm"].setHTML(
+					"Goal: " +
+						formatDistance(extremeStadiumGoal(name)) + // extremeStadiumGoal
+						"<br>Reward: " +
+						EXTREME_STADIUM_DATA[name].reward +
+						"<br>" +
+						(showCurrent ? "Currently: " + EXTREME_STADIUM_DATA[name].disp() : "")
+				);
+			}
+		}
+		tmp.el.extremeStadReset.setDisplay(modeActive("extreme"));
+	}
 }
 
 function updatePurgeHTML(){
@@ -724,15 +836,29 @@ function updateDerivativeHTML(){
 
 function updateAllInfinityHTML(){
 	if (player.tab == "inf") {
+		tmp.inf.updateTabs();
+		updateAllElementHTML("#knowledgeAmt",
+			showNum(player.inf.knowledge) +
+			" knowledge " + formatGain(player.inf.knowledge, tmp.inf.knowledgeGain)
+		)
+		updateAllElementHTML("#intelligenceAmt",
+			showNum(player.automation.intelligence) +
+			" intelligence " + formatGain(player.automation.intelligence, getIntelligenceGain().times(nerfActive("noTS") ? 1 : tmp.timeSpeed), "intel")
+		)
+		updateAllElementHTML("#neuronAmt",
+			showNum(player.inf.brain.neurons) +
+			" neurons " + formatGain(player.inf.brain.neurons, getNeuronGain())
+		)
 		updateInfinityEndorsementStuffHTML()
 		updateInfinitySubtabHTML()
+		updateBrainHTML()
 		updateAscensionHTML()
 
 		// The Stadium
-		if (infTab == "stadium") {
+		//if (infTab == "stadium") {
 			updateNormalStadiumHTML()
 			updateExtremeStadiumHTML()
-		}
+		//}
 
 		// The Pantheon
 		if (infTab == "pantheon") {
@@ -928,12 +1054,14 @@ function updateStatisticsHTML(){
 			tmp.el.rankTierStats.setDisplay(player.rank.gt(1)||player.tier.gt(0))
 			for (let i=0;i<Object.keys(RANK_DESCS).length;i++) {
 				let ranks = Object.keys(RANK_DESCS)[i]
+				let effPowDesc = ""
+				if (i == 3-1 || i == 12-1 || i == 14-1) effPowDesc += " <span class=\"grosstxt\">(^" + showNum(getRankEffPower((i+1) + "")) + ")</span>"
 				tmp.el["rankReward"+(i+1)].setDisplay(player.rank.gte(ranks))
 				if (tmp.el["rankDesc"+(i+1)]) {
 					if (typeof RANK_DESCS[ranks] == "function") {
-						tmp.el["rankDesc"+(i+1)].setTxt("("+(i+1)+") Rank " + showNum(rankRewardReq[i]) + ": "+RANK_DESCS[ranks]()[0].toUpperCase() + RANK_DESCS[ranks]().slice(1))
+						tmp.el["rankDesc"+(i+1)].setHTML("("+(i+1)+") Rank " + showNum(rankRewardReq[i]) + ": "+RANK_DESCS[ranks]()[0].toUpperCase() + RANK_DESCS[ranks]().slice(1) + effPowDesc)
 					} else {
-						tmp.el["rankDesc"+(i+1)].setTxt("("+(i+1)+") Rank " + showNum(rankRewardReq[i]) + ": "+RANK_DESCS[ranks][0].toUpperCase() + RANK_DESCS[ranks].slice(1))
+						tmp.el["rankDesc"+(i+1)].setHTML("("+(i+1)+") Rank " + showNum(rankRewardReq[i]) + ": "+RANK_DESCS[ranks][0].toUpperCase() + RANK_DESCS[ranks].slice(1) + effPowDesc)
 					}
 				}
 
@@ -941,8 +1069,15 @@ function updateStatisticsHTML(){
 			}
 			for (let i=0;i<Object.keys(TIER_DESCS).length;i++) {
 				let tiers = Object.keys(TIER_DESCS)[i]
-				tmp.el["tierReward"+tiers].setDisplay(player.tier.gt(tiers))
-				if (tmp.el["tierEff"+tiers]) tmp.el["tierEff"+tiers].setTxt(showNum(window["tier"+tiers+"Eff"]()));
+				tmp.el["tierReward"+(i+1)].setDisplay(player.tier.gte(tiers))
+				if (tmp.el["tierDesc"+(i+1)]) {
+					if (typeof TIER_DESCS[tiers] == "function") {
+						tmp.el["tierDesc"+(i+1)].setTxt("("+(i+1)+") Tier " + showNum(tierRewardReq[i]) + ": "+TIER_DESCS[tiers]()[0].toUpperCase() + TIER_DESCS[tiers]().slice(1))
+					} else {
+						tmp.el["tierDesc"+(i+1)].setTxt("("+(i+1)+") Tier " + showNum(tierRewardReq[i]) + ": "+TIER_DESCS[tiers][0].toUpperCase() + TIER_DESCS[tiers].slice(1))
+					}
+				}
+				if (tmp.el["tierEff"+(i+1)]) tmp.el["tierEff"+(i+1)].setTxt(showNum(getTierEffects(i+1)));
 			}
 		}
 	}
@@ -1419,7 +1554,6 @@ function updateMiscHTML(){
 	root.style.setProperty("--foamcol", player.options.theme == "dark" ? "#d3e8cc" : "#687364")
 
 	tmp.el.mainContainer.setDisplay(showContainer&&player.tab!="mlt");
-	tmp.el.loading.setDisplay(false)
 	tmp.el.footer.setDisplay(player.tab == "options");
 	tmp.el.newsticker.changeStyle('visibility', player.options.newst?'visible':'hidden');
 	tmp.el.hotkeys.setAttr("widetooltip", 
@@ -1642,7 +1776,7 @@ function updateHTML() {
 	updateAchievementsHTML()
 	updateAutomationHTML()
 	updateTimeReversalHTML()
-	updateCollpaseHTML()
+	updateCollapseHTML()
 	upadtePathogenHTML()
 	updateSoftcapsHTML()
 	updateDarkCircleHTML()

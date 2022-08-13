@@ -1,1 +1,1 @@
-const DC_UNL = new ExpantaNum("1e400000");
+const DC_UNL = new ExpantaNum("8e8888").times(DISTANCES.uni);

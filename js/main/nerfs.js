@@ -158,7 +158,9 @@ function adjustGen(val, type) {
 		type == "pathogens" ||
 		type == "dc" ||
 		type == "lifeEssence" ||
-		type == "cadavers";
+		type == "cadavers" ||
+		type == "cremationFuel";
+		
 	let pre_elem =
 		type == "knowledge" ||
 		type == "ascension" ||

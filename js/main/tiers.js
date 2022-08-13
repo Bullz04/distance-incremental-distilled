@@ -1,9 +1,23 @@
+let tierRewardDesc = []
+let tierRewardReq = []
+
+for (let i = 0; i < Object.keys(TIER_DESCS).length; i++) {
+	tierRewardDesc.push(Object.values(TIER_DESCS)[i])
+	tierRewardReq.push(new ExpantaNum(Object.keys(TIER_DESCS)[i]))
+}
+
+/*(function(){
+	for (let i = 0; i < tierRewardDesc.length; i++) {
+		console.log((i+1) + ". Tier " + showNum(tierRewardReq[i]) + ": " + tierRewardDesc[i])
+	}
+})()/**/
+
 function updateTempTiers() {
 	if (!tmp.tiers) tmp.tiers = {};
 	tmp.tiers.fp = getTierFP();
 	tmp.tiers.bc = getTierBaseCost();
-	tmp.tiers.req = new ExpantaNum(tmp.tiers.bc).plus(player.tier.div(tmp.tiers.fp).pow(2));
-	tmp.tiers.bulk = player.rank.sub(tmp.tiers.bc).max(0).sqrt().times(tmp.tiers.fp).add(1).round();
+	tmp.tiers.req = new ExpantaNum(tmp.tiers.bc).plus(player.tier.div(tmp.tiers.fp).times(2).pow(2));
+	tmp.tiers.bulk = player.rank.sub(tmp.tiers.bc).max(0).sqrt().times(tmp.tiers.fp).div(2).add(1).floor();
 	/*
 	if (scalingActive("tier", player.tier.max(tmp.tiers.bulk), "scaled")) {
 		let start = getScalingStart("scaled", "tier");
@@ -138,11 +152,22 @@ function updateTempTiers() {
 			.floor();
 	}*/
 
-	tmp.tiers.desc = player.tier.lt(Number.MAX_VALUE)
-		? TIER_DESCS[player.tier.toNumber()]
-			? TIER_DESCS[player.tier.toNumber()]
-			: DEFAULT_TIER_DESC
-		: DEFAULT_TIER_DESC;
+	let reachedRewards = () => {
+		let num = 0
+		for (let i = 0; i < tierRewardReq.length; i++) {
+			let reached = true
+			if (player.tier.lt(tierRewardReq[i])) reached = false
+			if (reached) num++
+		}
+		return num
+	}
+	if (typeof tierRewardDesc[reachedRewards()] == "function") {
+		if (reachedRewards() > (tierRewardReq.length-1)) tmp.tiers.desc = ""
+		else tmp.tiers.desc = "At Tier " + showNum(tierRewardReq[reachedRewards()]) + ", " + tierRewardDesc[reachedRewards()]()
+	} else {
+		if (reachedRewards() > (tierRewardReq.length-1)) tmp.tiers.desc = ""
+		else tmp.tiers.desc = "At Tier " + showNum(tierRewardReq[reachedRewards()]) + ", " + tierRewardDesc[reachedRewards()]		
+	}
 	tmp.tiers.canTierUp = player.rank.gte(tmp.tiers.req);
 	if (nerfActive("noTier")) tmp.tiers.canTierUp = false;
 	tmp.tiers.layer = new Layer("tier", tmp.tiers.canTierUp, "semi-forced");
@@ -162,11 +187,12 @@ function updateTempTiers() {
 }
 
 function getTierFP() {
-	let fp = new ExpantaNum(0.5)
+	let fp = new ExpantaNum(1)
+	if (player.tier.gte(tierRewardReq[12])) fp = fp.times(getTierEffects("13"))
 	if (player.elementary.sky.unl && tmp.elm && !scalingActive("tier", player.tier, "scaled")) fp = fp.sub(tmp.elm.sky.pionEff[10]).pow(-1)
 	if (player.tr.upgrades.includes(20) && !HCCBA("noTRU") && modeActive("extreme")) fp = fp.times(player.rankCheap.plus(1).log10().plus(1).log10().plus(1));
 	if (extremeStadiumActive("cranius", 5)) fp = fp.div(player.rankCheap.plus(1))
-	if (tmp.ach) if (tmp.ach[194].has) fp = fp.times(1.0069);
+	//if (tmp.ach) if (tmp.ach[194].has) fp = fp.times(1.0069);
 	return fp
 }
 
@@ -176,6 +202,55 @@ function getTierBaseCost() {
 	if (modeActive("easy") && player.tier < 2) bc = bc.sub(1);
 	if (tmp.inf) if (tmp.inf.stadium.active("solaris", 5) || tmp.inf.stadium.active("spaceon", 6)) bc = bc.plus(25);
 	return bc
+}
+
+function getTierEffBases(a) {
+	switch (a+"") {
+		case "2": {
+			let base = new ExpantaNum(1.3)
+			if (player.tr.upgrades.includes(8) && !HCCBA("noTRU")) base = base.times(tr8Eff())
+			return base
+		}
+		case "8":
+			return new ExpantaNum(1.1)
+	}
+}
+
+function getTierEffects(a) {
+	switch (a+"") {
+		case "1":
+			return new ExpantaNum(1.15)
+		case "2":
+			return ExpantaNum.pow(getTierEffBases("2"), player.rank)
+		case "3": {
+			let t = player.tier;
+			return EN.logBase(t.plus(1), 3).times(0.1).plus(1).pow(1.301)
+		}
+		case "4":
+			return new ExpantaNum(30)
+		case "5":
+			return new ExpantaNum(2)
+		case "6":
+			return new ExpantaNum(5)
+		case "7":
+			return new ExpantaNum(1.5)
+		case "8":
+			return ExpantaNum.pow(getTierEffBases("8"), player.rf)
+		case "9":
+			return new ExpantaNum(10)
+		case "10":
+			return ExpantaNum.logBase(player.automation.intelligence.plus(3), 3)
+		case "11":
+			return new ExpantaNum(15)
+		case "12": {
+			let eff = player.automation.intelligence.plus(1).logBase(10).plus(1).logBase(10).times(0.04).plus(1)
+			return eff
+		}
+		case "13":
+			return new ExpantaNum(1.03)
+		default:
+			return new ExpantaNum(1)
+	}
 }
 
 function tier1Eff() {

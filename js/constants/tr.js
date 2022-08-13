@@ -37,7 +37,7 @@ const TR_UPGS = {
 			return showNum(x) + "x";
 		}
 	},
-	5: { cost: function(){return new ExpantaNum(150000)}, desc: "Rocket Fuel is 10% stronger." },
+	5: { cost: function(){return new ExpantaNum(150000)}, desc: "Rocket Fuel is 25% stronger." },
 	6: {
 		cost: function(){
 			return new ExpantaNum(2.5e7)
@@ -54,7 +54,7 @@ const TR_UPGS = {
 		cost: function(){
 			return new ExpantaNum(1e8)
 		},
-		desc: "Time goes by 5% faster for every achievement gotten.",
+		desc: () => "Time goes by x" + showNum(tr7EffBase()) + " faster for every achievement gotten.",
 		current: function () {
 			return tr7Eff();
 		},
@@ -66,7 +66,7 @@ const TR_UPGS = {
 		cost: function(){
 			return new ExpantaNum(4e9)
 		},
-		desc: "Rankbot's interval boosts its magnitude.",
+		desc: () => "Each rank boosts 2nd Tier reward base by +x" + showNum(tr8EffBase()) + ".",
 		current: function () {
 			return tr8Eff();
 		},
@@ -78,17 +78,17 @@ const TR_UPGS = {
 		cost: function(){
 			return new ExpantaNum(1.2e11)
 		},
-		desc: "Tierbot's interval boosts its magnitude, but not as strongly as the previous upgrade.",
+		desc: "Intelligence and Time cubes boost each other in gain.",
 		current: function () {
 			return tr9Eff();
 		},
 		disp: function (x) {
-			return showNum(x) + "x";
+			return "Time cube gain: x" + showNum(x.cubeGain) + ", Intelligence gain: x" + showNum(x.intelligenceGain);
 		}
 	},
 	10: {
 		cost: function(){
-			return new ExpantaNum(5e11)
+			return new ExpantaNum(3e12)
 		},
 		desc: "Time Cubes boost Rocket gain",
 		current: function () {
@@ -100,59 +100,58 @@ const TR_UPGS = {
 	},
 	11: {
 		cost: function(){
-			return new ExpantaNum(modeActive("extreme+hikers_dream") ? 1e70 : 1e60)
+			return new ExpantaNum(modeActive("extreme+hikers_dream") ? "1e530" : "1e520")
 		},
-		desc: "Time Cubes and Dark Flow boost each other, and Scaled Rank scaling starts 10 Ranks later.",
+		desc: "Dark matter boosts ash gain",
 		current: function () {
 			return tr11Eff();
 		},
 		disp: function (g) {
-			return "Cubes: " + showNum(g.cg) + "x, Flow: " + showNum(g.dcf) + "x";
+			return "x" + showNum(g);
 		}
 	},
 	12: {
 		cost: function(){
-			return new ExpantaNum(modeActive("extreme+hikers_dream") ? 1e105 : 1e70)
+			return new ExpantaNum(modeActive("extreme+hikers_dream") ? "1e666" : "1e590")
 		},
-		desc: "Each component of The Dark Circle boosts Dark Flow, and Scaled Tier scaling starts 2 Tiers later.",
+		desc: "Dark fluid boosts pathogen gain",
 		current: function () {
 			return tr12Eff();
 		},
 		disp: function (x) {
-			return showNum(x) + "x";
+			return "x" + showNum(x);
 		}
 	},
 	13: {
 		cost: function(){
-			return new ExpantaNum(modeActive("extreme+hikers_dream") ? 1e115 : 1e105)
+			return new ExpantaNum(modeActive("extreme+hikers_dream") ? "1e800" : "1e700")
 		},
-		desc: "Each component of The Dark Circle boosts Pathogen Upgrade efficiency.",
+		desc: "Time Cubes boost Dark Core FP and Cadaver gain.",
 		current: function () {
 			return tr13Eff();
 		},
 		disp: function (x) {
-			return "+" + showNum(x.times(100)) + "%";
+			return "Core FP: x" + showNum(x.coreFP) + ", Cadaver gain: " + showNum(x.cadaverGain) + "x";
 		}
 	},
 	14: {
 		cost: function(){
-			return new ExpantaNum(modeActive("extreme+hikers_dream") ? 1e123 : 1e115)
+			return new ExpantaNum(modeActive("extreme+hikers_dream") ? "1e1050" : "1e870")
 		},
 		desc:
-			"Tiers do not reset anything, Scaled Tier scaling starts later based on your Dark Cores, and Tiers boost Cadaver gain.",
+			"Dark cores boost Dark Fluid and Dark Energy gain.",
 		current: function () {
 			return tr14Eff();
 		},
 		disp: function (g) {
-			return "Tier scaling: " + showNum(g.ss) + " later, Cadavers: " + showNum(g.cd) + "x";
+			return showNum(g) + "x";
 		}
 	},
 	15: {
 		cost: function(){
-			return new ExpantaNum(modeActive("extreme+hikers_dream") ? 1e127 : 4.56e123)
+			return new ExpantaNum(modeActive("extreme+hikers_dream") ? "1e1200" : "1e1000")
 		},
-		desc:
-			"Scaled Rank scaling starts 32 Ranks later, and all effects of The Dark Circle are stronger based on your Dark Cores.",
+		desc: () => "Time cubes boost dark flow",
 		current: function () {
 			return tr15Eff();
 		},

@@ -11,6 +11,9 @@ const TABBTN_SHOWN = {
 	achievements: function () {
 		return true;
 	},
+	money: function () {
+		return true;
+	},
 	energy: function() {
 		return modeActive("hikers_dream");
 	},
@@ -48,6 +51,7 @@ const FULL_TAB_NAMES = {
 	options: "Options",
 	statistics: "Statistics",
 	achievements: "Achievements",
+	money: "Unlock Full Game",
 	energy: "Energy",
 	rockets: "Rockets",
 	furnace: "Furnace",
@@ -66,4 +70,9 @@ const STAT_TABBTN_SHOWN = {
 	mainStats() { return true },
 	scalings() { return statScalingsShown },
 	rankTiers() { return player.rank.gt(1)||player.tier.gt(0) },
+}
+
+const COLLAPSE_TABBTN_SHOWN = {
+	cadavers: function() { return true },
+	crematorium: function() { return player.collapse.crematorium.unl },
 }

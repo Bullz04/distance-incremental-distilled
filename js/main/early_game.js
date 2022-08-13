@@ -1,23 +1,24 @@
 function calcAcceleration(){
-	tmp.acc = new ExpantaNum(0.1);
+	tmp.acc = new ExpantaNum(0.1);//default = 0.1
 	if (modeActive("hard")) tmp.acc = tmp.acc.div(3);
 	if (modeActive("easy")) tmp.acc = tmp.acc.times(2);
 	if (player.rank.gte(rankRewardReq[1])) tmp.acc = tmp.acc.times(getRankEffects("2"));
 	if (player.rank.gte(rankRewardReq[2])) tmp.acc = tmp.acc.times(getRankEffects("3"));
-	if (player.tier.gt(1)) tmp.acc = tmp.acc.times(tier1Eff());
 	if (player.rank.gte(rankRewardReq[3])) tmp.acc = tmp.acc.times(getRankEffects("4"));
 	if (player.rank.gte(rankRewardReq[4])) tmp.acc = tmp.acc.times(getRankEffects("5"));
 	if (player.rank.gte(rankRewardReq[5])) tmp.acc = tmp.acc.times(getRankEffects("6"));
 	if (player.rank.gte(rankRewardReq[7])) tmp.acc = tmp.acc.times(getRankEffects("8"));
-	if (player.tier.gt(3)) tmp.acc = tmp.acc.times(3);
 	if (player.rank.gte(rankRewardReq[10])) tmp.acc = tmp.acc.times(getRankEffects("11"));
-	if (player.tier.gt(5)) tmp.acc = tmp.acc.times(5);
 	if (player.rank.gte(rankRewardReq[14])) tmp.acc = tmp.acc.times(getRankEffects("15"));
 	if (player.rank.gte(rankRewardReq[19])) tmp.acc = tmp.acc.times(getRankEffects("20"));
-	if (player.tier.gt(8)) tmp.acc = tmp.acc.times(10);
-	if (player.tier.gt(10)) tmp.acc = tmp.acc.times(15);
 	if (player.rank.gte(rankRewardReq[24])) tmp.acc = tmp.acc.times(getRankEffects("25"))
-	if (player.tier.gt(15)) tmp.acc = tmp.acc.times(25);
+
+	if (player.tier.gte(tierRewardReq[1])) tmp.acc = tmp.acc.times(getTierEffects("2"))
+	if (player.tier.gte(tierRewardReq[3])) tmp.acc = tmp.acc.times(getTierEffects("4"))
+	if (player.tier.gte(tierRewardReq[5])) tmp.acc = tmp.acc.times(getTierEffects("6"))
+	if (player.tier.gte(tierRewardReq[8])) tmp.acc = tmp.acc.times(getTierEffects("9"))
+	if (player.tier.gte(tierRewardReq[10])) tmp.acc = tmp.acc.times(getTierEffects("11"))
+
 	if (tmp.ach) if (tmp.ach[12].has) tmp.acc = tmp.acc.times(1.1);
 	if (tmp.ach) if (tmp.ach[22].has) tmp.acc = tmp.acc.times(1.05);
 	if (tmp.ach) if (tmp.ach[23].has) tmp.acc = tmp.acc.times(1.2);
@@ -46,19 +47,20 @@ function calcAcceleration(){
 }
 
 function calcMaxVelocity(){
-	tmp.maxVel = new ExpantaNum(1);
+	tmp.maxVel = new ExpantaNum(1);//default = 1
 	if (player.rank.gte(rankRewardReq[0])) tmp.maxVel = tmp.maxVel.times(getRankEffects("1"));
 	if (modeActive("hard")) tmp.maxVel = tmp.maxVel.div(2);
 	if (modeActive("easy")) tmp.maxVel = tmp.maxVel.times(3);
 	if (player.rank.gte(rankRewardReq[1])) tmp.maxVel = tmp.maxVel.times(getRankEffects("2"));
 	if (player.rank.gte(rankRewardReq[2])) tmp.maxVel = tmp.maxVel.times(getRankEffects("3"));
-	if (player.tier.gt(1)) tmp.maxVel = tmp.maxVel.times(tier1Eff());
 	if (player.rank.gte(rankRewardReq[3])) tmp.maxVel = tmp.maxVel.times(getRankEffects("4"));
 	if (player.rank.gte(rankRewardReq[4])) tmp.maxVel = tmp.maxVel.times(getRankEffects("5"));
 	if (player.rank.gte(rankRewardReq[5])) tmp.maxVel = tmp.maxVel.times(getRankEffects("6"));
 	if (player.rank.gte(rankRewardReq[10])) tmp.maxVel = tmp.maxVel.times(getRankEffects("11"))
 	if (player.rank.gte(rankRewardReq[20])) tmp.maxVel = tmp.maxVel.times(getRankEffects("21"));
-	if (player.tier.gt(9)) tmp.maxVel = tmp.maxVel.times(tier9Eff());
+
+	if (player.tier.gte(tierRewardReq[1])) tmp.maxVel = tmp.maxVel.times(getTierEffects("2"));
+
 	if (tmp.pathogens && player.pathogens.unl) tmp.maxVel = tmp.maxVel.times(tmp.pathogens[4].eff());
 	if (tmp.ach) if (tmp.ach[46].has) tmp.maxVel = tmp.maxVel.times(ach46Eff("Max Velocity"))
 	if (tmp.ach) if (tmp.ach[21].has) tmp.maxVel = tmp.maxVel.times(1.1);

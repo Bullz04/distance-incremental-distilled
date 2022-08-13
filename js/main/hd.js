@@ -1,7 +1,7 @@
 const ENERGY_UPG_COSTS = {
 	1: new ExpantaNum(70),
-	2: new ExpantaNum(100),
-	3: new ExpantaNum(200),
+	2: new ExpantaNum(80),
+	3: new ExpantaNum(100),
 	4: new ExpantaNum(300),
 	5: new ExpantaNum(140),
 	6: new ExpantaNum(200),
@@ -58,7 +58,10 @@ function getBaseMotiveScalingStart(){
 }
 
 function getBaseMotive(){
-	let z = player.rank.plus(1).times(player.tier.plus(1).pow(2)).times(tmp.hd.incline.plus((player.energyUpgs.includes(13)&&tmp.hd.enerUpgs) ? tmp.hd.enerUpgs[13] : 0).div(90).plus(1)).times((player.energyUpgs.includes(28)&&tmp.hd.enerUpgs)?tmp.hd.enerUpgs[28]:1)
+	let z = player.rank.plus(1)
+		.times(player.tier.plus(1).pow(2))
+		.times(tmp.hd.incline.plus((player.energyUpgs.includes(13)&&tmp.hd.enerUpgs) ? tmp.hd.enerUpgs[13] : 0).div(90).plus(1).times(2))
+		.times((player.energyUpgs.includes(28)&&tmp.hd.enerUpgs)?tmp.hd.enerUpgs[28]:1)
 	let y = getBaseMotiveScalingStart()
 	if (tmp.ach) if (z.gt(y) && modeActive("extreme") && !tmp.ach[87].has) return z.div(y).pow(.5).times(y)
 	return z
@@ -85,10 +88,9 @@ function getOptimizationOneEffect(){
 	if (modeActive("extreme")){
 		if (tmp.ach) if (tmp.ach[66].has) op1 = op1.times(ExpantaNum.pow(player.furnace.coal.plus(10).log10(), 2))
 	}
-	if (op1.gt(getOptimizationOneScalingStart()) && modeActive("extreme")) {
-		e = getOptimizationOneScalingStart().logBase(getOptimizationOneScalingStart().log10().times(5))
-		return op1.log10().times(5).pow(e)
-	}
+	op1 = op1.pow(
+		ExpantaNum.logBase(tmp.hd.motive.plus(2), 2)
+	)
 	return op1
 }
 

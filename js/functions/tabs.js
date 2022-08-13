@@ -73,3 +73,31 @@ function updateStatTabs() {
 function showStatTab(name) {
 	statTab = name;
 }
+
+// Collapse Tabs
+
+function isCollapseTabShown(name) {
+	return collapseTab == name;
+}
+
+function getCollapseTabBtnsShown() {
+	let btns = [];
+	for (j = 0; j < Object.keys(COLLAPSE_TABBTN_SHOWN).length; j++)
+		if (Object.values(COLLAPSE_TABBTN_SHOWN)[i]()) btns.push(Object.keys(COLLAPSE_TABBTN_SHOWN)[i]);
+	return btns;
+}
+
+function updateCollapseTabs() {
+	var tabs = document.getElementsByClassName("collapseTab");
+	for (i = 0; i < tabs.length; i++) {
+		var el = new Element(tabs[i].id);
+		el.setDisplay(isCollapseTabShown(tabs[i].id));
+		var elT = new Element(tabs[i].id + "CollapseTabButton");
+		//elT.changeStyle("visibility", getCollapseTabBtnsShown().includes(tabs[i].id)?"visible":"hidden");
+		elT.setDisplay(getCollapseTabBtnsShown().includes(tabs[i].id));
+	}
+}
+
+function showCollapseTab(name) {
+	collapseTab = name;
+}

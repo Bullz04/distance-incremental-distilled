@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <head>
-	<title>Distance Incremental</title>
+	<title>Distance Incremental Distilled</title>
 	<link rel="icon" href="images/game_icon.ico" type="image/icon type" />
 </head>
 <body id="body" onload="loadGame()">
 	<div id="loading">
-		<br><br><br><br>
-		<img src="images/game_icon.ico" style="width: 200px; height: 200px;"></img>
-		<span class="centered" style="color: white">Loading...<br><span style="font-size: 20px !important;"><a href="https://discord.gg/wwQfgPa" target="_blank">Help</a></span></span>
+		<img class="centered" src="images/game_icon.ico" style="width: 200px; height: 200px; z-index: 1;"></img>
+		<span align="center" class="centered" style="color: white; z-index: 1;">Loading...<br><span style="font-size: 20px;"><a href="https://discord.gg/wwQfgPa" target="_blank">Discord</a></span></span>
 	</div>
 	<div id="mltContainer" style="display: none">
 		<br><span class="mltTitle">Multiverse Map</span><br><br>
@@ -106,6 +105,11 @@
 							</button>
 						</td>
 						<td>
+							<button id="moneytabbtn" class="btn tb main" onclick="showTab('money')">
+								Unlock Full Game
+							</button>
+						</td>
+						<td>
 							<button
 								id="energytabbtn"
 								class="btn tb en main"
@@ -174,6 +178,7 @@
 			<table>
 				<tr>
 					<td>
+						<span id="rankFP"></span>
 						<span id="rankName"></span> <span id="rank"></span>:
 						<button id="rankUp" class="btn locked" onclick="tmp.ranks.layer.reset(false, false)">
 							Reset your journey to rank up. <span id="rankDesc" class="based"></span><br />Req:
@@ -190,9 +195,10 @@
 				</tr>
 			</table>
 			<br /><br />
+			<span id="tierFP"></span>
 			<span id="tierName"></span> <span id="tier"></span>:
 			<button id="tierUp" class="btn locked" onclick="tmp.tiers.layer.reset(false, false)">
-				Reset your ranks, but <span id="tierDesc" class="based"></span><br />Req: Rank
+				Reset your ranks to tier up. <span id="tierDesc" class="based"></span><br />Req: Rank
 				<span id="tierReq" class="based"></span>.
 			</button><br><br>
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button id="quickReset" class="btn" onclick="quickReset()" style="min-width: 200px;" tooltip="Performs a Rank reset (without the reward)">Quick Reset</button><br><br><br>
@@ -237,6 +243,7 @@
 					<b><span id="modeComboCompletions"></span></b><br><br>
 					<div id="modeComboTable" class="flexContainer"></div>
 				</div>
+				Note: These modes aren't balanced yet. So, play these modes with your own risk!
 				<div id="mctna">
 					<table>
 						<tr>
@@ -375,7 +382,7 @@
 			<div class="band">
 				<table>
 					<tr>
-						<td><button class="btn tb inf" style="visibility: hidden;"></button></td>
+						<td><button class="btn tb inf" style="visibility: hidden;">s</button></td>
 					</tr>
 					<tr>
 						<td>
@@ -403,7 +410,7 @@
 				<span id="maxEnd"></span><br>
 				<span id="maxEP"></span><br><br>
 			</div><div id="scalings" class="stattab" style="display: none;">
-				<div align="center" style="min-width: 100%;">
+				<div align="middle" style="min-width: 100%;">
 					<b>Scaling Levels</b><br><br>
 					<span id="scaledStat">Scaled</span>&nbsp;
 					<span id="superscaledStat">Superscaled</span>&nbsp;
@@ -420,6 +427,17 @@
 			<div id="achDesc" class="band gn"></div>
 			<table id="achTable"></table>
 			<div id="achFin"></div>
+		</div>
+		<div id="money" class="tab" style="display: none;">
+			You have 0 Distabucks<br><br>
+			Full game features:<br>
+			<div align="left" style="padding-left: 25%; padding-right: 25%;">
+				- Faster progress<br>
+				- Access to hidden features <span style="color: red;">(super secret)</span><br>
+				- Resource Mastery<br>
+			</div>
+			<br>
+			<button class="btn locked">Unlock full game<br>100 Distabucks</button>
 		</div>
 		<div id="energy" class="tab" style="display: none;">
 			<div class="band ylw">
@@ -852,7 +870,7 @@
 				<tr>
 					<td>You have <span id="scraps"></span>.</td>
 					<td>&emsp;</td>
-					<td>You have <span id="intAmt"></span>.</td>
+					<td>You have <span id="intelligenceAmt"></span>.</td>
 				</tr>
 			</table>
 			<table>
@@ -910,22 +928,83 @@
 			><br /><br />
 			You have <span id="tc"></span>, translated to <span id="frf"></span> free rocket fuel
 			<span id="timeCubeEffSC"></span><br /><br />
-			<table id="trTable"></table>
+			<div style="width: 100%; overflow-x:scroll; max-height: 360px;">
+				<table id="trTable"></table>
+			</div>
 			<br>
 		</div>
 		<div id="collapse" class="tab" style="display: none;">
-			<button id="collapseReset" class="btn locked" onclick="tmp.collapse.layer.reset()">
-				Reset all previous progress to gain <span id="cadaverGain" class="dead2"></span> cadavers
-				<span id="cadaverGainSC"></span></button
-			><br /><br />
-			You have <span id="cadavers"></span>, which make time go <span id="cadaverEff" class="dead"></span>x faster
-			<span id="cadaverEffSC"></span><br /><br />
-			<button id="sacrificeCadavers" class="btn locked" onclick="sacrificeToLifeEssence()">
-				Sacrifice all your cadavers into life essence.</button
-			><br /><br />
-			You have <span id="lifeEssence"></span>.<br /><br />
-			<table id="cmTable"></table>
-			<br /><br />
+			<div class="band deadStyle">
+				<table>
+					<tr>
+						<td><button class="btn tb inf" style="visibility: hidden;"></button></td>
+					</tr>
+					<tr>
+						<td>
+							<button id="cadaversCollapseTabButton" class="btn main btndd" onclick="showCollapseTab('cadavers')">
+								Cadavers
+							</button>
+						</td>
+						<td>
+							<button id="crematoriumCollapseTabButton" class="btn main crematorium" onclick="showCollapseTab('crematorium')">
+								Crematorium
+							</button>
+						</td>
+					</tr>
+				</table>
+			</div>
+			<br>
+			
+			<div id="cadavers" class="collapseTab">
+				<button id="collapseReset" class="btn locked" onclick="tmp.collapse.layer.reset()">
+					Reset all previous progress to gain <span id="cadaverGain" class="dead2"></span> cadavers
+					<span id="cadaverGainSC"></span></button
+				><br /><br />
+				You have <span id="cadaverAmt"></span>, which make time go <span id="cadaverEff" class="dead"></span>x faster
+				<span id="cadaverEffSC"></span><br /><br />
+				<button id="sacrificeCadavers" class="btn locked" onclick="sacrificeToLifeEssence()">
+					Sacrifice all your cadavers into life essence.</button
+				><br /><br />
+				You have <span id="lifeEssence"></span>.<br /><br />
+				<table id="cmTable"></table>
+				<br /><br />
+			</div>
+			<div id="crematorium" class="collapseTab">
+				<table>
+					<tr>
+						<td>You have <span id="cadaverAmt"></span></td>
+						<td>&emsp;</td>
+						<td>You have <span id="cremationFuelAmt"></span></td>
+					</tr>
+				</table><br>
+				You have <span id="cremAshAmt"></span>, which boost cadaver gain by x<span id="CremAshEffCadavers" class="dead"></span>
+				<br> and cremation fuel gain by x<span id="CremAshEffCremFuel" class="dead"></span><br><br>
+				<table>
+					<tr>
+						<td>Incinerator speed: x<span id="incineratorSpeed"></span></td>
+						<td>&emsp;</td>
+						<td>Incinerator bulk cap: x<span id="incineratorBulkCap"></span></td>
+					</tr>
+				</table><br><br>
+				Pending processes left: <span id="pendingProcessesLeft"></span><br>
+				Incinerator progress: <span id="incineratorProgress"></span><br>
+				<button onclick="tmp.collapse.crematorium.incinerator.cancelProcess()" class="btn crematorium" style="max-width: none;">Cancel Process<br>(Refunds your cremation fuel and cadavers)</button><br><br>
+				<button 
+					id="cremFurnaceText" class="btn crematorium" style="width: 200px; height: 100px;"
+					onclick="tmp.collapse.crematorium.incinerator.addProcess(0, true)"
+				></button><br><br><br>
+				<span class="title">Repeatable Crematorium Upgrades</span><br><br>
+				<div id="repCrUpgMaxAll">
+					<br>
+					<button 
+						id="cremFurnaceText" class="btn crematorium"
+						onclick="tmp.collapse.crematorium.maxAll()"
+					>Max All</button><br>
+				</div>
+				<div id="RCrUpgTable"></div><br><br>
+				<span class="title">Normal Crematorium Upgrades</span><br><br>
+				<div id="NCrUpgTable"></div>
+			</div>
 		</div>
 		<div id="pathogens" class="tab" style="display: none;">
 			<span id="tdeEff"></span>
@@ -936,6 +1015,7 @@
 			<br /><br />
 		</div>
 		<div id="dc" class="tab" style="display: none;">
+			<span id="Ach75RewardEff"></span>
 			Dark Flow: <span id="darkFlow" style="font-weight: bold;"></span>x<br />
 			<table>
 				<tr>
@@ -999,6 +1079,11 @@
 							</button>
 						</td>
 						<td>
+							<button id="braintabbtn" class="btn tb std main" onclick="tmp.inf.showTab('brain')">
+								Brain
+							</button>
+						</td>
+						<td>
 							<button id="ascensiontabbtn" class="btn tb asc main" onclick="tmp.inf.showTab('ascension')">
 								Ascension
 							</button>
@@ -1039,6 +1124,26 @@
 				<br /><br />
 				<div style="overflow-x: auto;"><table id="infUpgs"></table><br><br></div>
 				<br /><br />
+			</div>
+			<div id="brain" class="inftab">
+				<div id="brainLockedText">
+					This feature unlocks at 8 Endorsements<br>Keep Playing!
+				</div>
+				<div id="brainMainUI">
+					<br>
+					You have <span id="mindMachines" class="brainText" style="font-size: 25px;"></span> mind machines. (Next at Rank <span id="nextMindMachine" style="font-size: 25px;"></span>)<br>
+					which boost neuron gain by x<span id="mindMachineEffect" class="brainText" style="font-size: 25px;"></span><br><br><br>
+					<table>
+						<tr>
+							<td>You have <span id="knowledgeAmt"></span></td>
+							<td>&emsp;</td>
+							<td>You have <span id="neuronAmt"></span> neurons</td>
+							<td>&emsp;</td>
+							<td>You have <span id="intelligenceAmt"></span></td>
+						</tr>
+					</table><br>
+					Coming Soon
+				</div>
 			</div>
 			<div id="ascension" class="inftab">
 				<br />
@@ -2370,6 +2475,7 @@
 	
 	<!-- Links -->
 	<link rel="stylesheet" type="text/css" href="style.css" />
+	<link rel="stylesheet" type="text/css" href="additionalStyle.css" />
 
 	<!-- Initial Stuff -->
 	<script type="text/javascript" src="js/jQuery.min.js"></script>

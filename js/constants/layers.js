@@ -54,8 +54,8 @@ const LAYER_REQS = {
 	tier: ["rank", 3],
 	rockets: ["distance", new EN(1e40)],
 	rf: ["rockets", 100],
-	collapse: ["distance", new ExpantaNum("1e470")],
-	inf: ["distance", new ExpantaNum("1e1e6")],
+	collapse: ["distance", new ExpantaNum("1e485")],
+	inf: ["distance", new ExpantaNum("1e20000")],
 	elementary: [
 		["rockets", new ExpantaNum("1e300000")],
 		["cadavers", new ExpantaNum("1e30000")],
@@ -69,7 +69,7 @@ const LAYER_FP = {
 	tier: 1,
 	rockets: 1/10,
 	rf: 1,
-	collapse: 1/70,
+	collapse: 1/50,
 	inf: 1,
 	elementary: 1,
 	multiverse: 1,
@@ -91,7 +91,10 @@ const LAYER_RESETS_NOTHING = {
 	rankCheap() { return tmp.ach[112].has },
 	tier() { return player.tr.upgrades.includes(14) && !HCCBA("noTRU") },
 	rockets() { return false },
-	rf() { return modeActive("extreme") ? (player.tr.upgrades.includes(17) && !HCCBA("noTRU")) : player.inf.unl },
+	rf() { 
+		let condition = (modeActive("extreme") ? (player.tr.upgrades.includes(17) && !HCCBA("noTRU")) : player.inf.unl) || tmp.ach[61].has
+		return condition
+	},
 	collapse() { return false },
 	inf() { return false },
 	elementary() { return false },

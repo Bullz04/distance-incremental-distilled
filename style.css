@@ -99,10 +99,10 @@ body {
 
 .btn.bought {
 	box-shadow: 3px 4px 0px 0px #218a7d;
-	background: linear-gradient(to bottom, #1bbfb4 5%, #34ebe5 100%);
-	background-color: #1bbfb4;
+	background: linear-gradient(to bottom, #18a59c 5%, #2abbb6 100%);
+	background-color: #18a59c;
 	border-radius: 18px;
-	border: 1px solid #15d1ce;
+	border: 1px solid #11a3a1;
 	display: inline-block;
 	color: #ffffff;
 	cursor: default;
@@ -120,10 +120,10 @@ body {
 
 .btn.locked {
 	box-shadow: 3px 4px 0px 0px #8a2a21;
-	background: linear-gradient(to bottom, #c62d1f 5%, #f24437 100%);
-	background-color: #c62d1f;
+	background: linear-gradient(to bottom, #a3251a 5%, #c7382e 100%);
+	background-color: #a3251a;
 	border-radius: 18px;
-	border: 1px solid #d02718;
+	border: 1px solid #bb2416;
 	display: inline-block;
 	cursor: not-allowed;
 	color: #ffffff;
@@ -135,8 +135,8 @@ body {
 }
 
 .btn.locked:hover {
-	background: linear-gradient(to bottom, #f24437 5%, #c62d1f 100%);
-	background-color: #f24437;
+	background: linear-gradient(to bottom, #c7382e 5%, #a3251a 100%);
+	background-color: #c7382e;
 }
 
 .btn.locked:active {
@@ -334,11 +334,31 @@ table {
 	text-shadow: 0px 1px 0px #958e99;
 }
 
+.dead.mini {
+	font-size: 10px;
+	color: #7f698c;
+	font-weight: bold;
+	text-shadow: 0px 1px 0px #958e99;
+}
+
+
 .alive {
 	font-size: 15px;
 	color: #5d8576;
 	font-weight: bold;
 	text-shadow: 0px 1px 0px #8a9692;
+}
+
+.alive.mini {
+	font-size: 10px;
+	color: #5d8576;
+	font-weight: bold;
+	text-shadow: 0px 1px 0px #8a9692;
+}
+
+.deadStyle {
+	background: linear-gradient(to bottom, #830bbf 5%, #9405fa 100%);
+	background-color: #830bbf;
 }
 
 .btn.btndd {
@@ -728,7 +748,7 @@ table {
 .hiddenDiv {
 	text-align: center;
 	vertical-align: center;
-	animation: hiddenDiv 4s ease 1;
+	animation: hiddenDiv 2s ease 1;
 	animation-fill-mode: forwards;
 	margin: 0;
 }
@@ -736,7 +756,7 @@ table {
 .hiddenDivShrink {
 	text-align: center;
 	vertical-align: center;
-	animation: hiddenDivShrink 2s ease 1;
+	animation: hiddenDivShrink 1s ease 1;
 	animation-fill-mode: forwards;
 	margin: 0;
 }
@@ -752,7 +772,7 @@ table {
 }
 
 .infinity {
-	color: #5e4909;
+	animation: infinityAnim 2s linear infinite;
 	font-weight: bold;
 }
 
@@ -1409,8 +1429,14 @@ table {
 }
 
 #loading {
-	text-align: center;
-	position: relative;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+}
+
+#loading > * {
+	/*text-align: center;*/
+	position: absolute;
 	font-size: 25px;
 }
 
@@ -2257,6 +2283,15 @@ table {
 	}
 	100% {
 		background-position: 0% 200%;
+	}
+}
+
+@keyframes infinityAnim {
+	0%, 100% {
+		color: #5e4909;
+	}
+	50% {
+		color: #8d6e0f;
 	}
 }
 

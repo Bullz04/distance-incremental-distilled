@@ -1,6 +1,6 @@
 function getFuelPow() {
 	let pow = new ExpantaNum(1);
-	if (player.tr.upgrades.includes(5) && !HCCBA("noTRU")) pow = pow.times(1.1);
+	if (player.tr.upgrades.includes(5) && !HCCBA("noTRU")) pow = pow.times(1.25);
 	return pow
 }
 
@@ -34,7 +34,7 @@ function getDistilledFuelEff() {
 		.plus(getFreeFuel())
 		.times(getFuelPow());
 	
-	let eff = EN.log(player.distance.plus(10), 10).pow(trf).root(3)
+	let eff = EN.logBase(player.distance.plus(10), 10).pow(trf).root(2.5)
 	return eff
 }
 
@@ -50,7 +50,7 @@ function updateTempRF() {
 	tmp.rf.bc = new ExpantaNum(100);
 	if (modeActive("extreme")) tmp.rf.bc = new ExpantaNum(30);
 	tmp.rf.fp = getRocketFuelFP();
-	tmp.rf.req = tmp.rf.bc.times(ExpantaNum.pow(5, player.rf.div(tmp.rf.fp).pow(1.25))).round();
+	tmp.rf.req = tmp.rf.bc.times(ExpantaNum.pow(5, player.rf.div(tmp.rf.fp).pow(1.25))).floor();
 	tmp.rf.bulk = player.rockets
 		.div(tmp.rf.bc)
 		.max(1)

@@ -72,6 +72,21 @@ function loadTempFeatures() {
 				} else return player.collapse.cadavers.div(new ExpantaNum(PATHOGENS_UNL).times(tmp.pathogens ? tmp.pathogens.lrm : 1))
 			}
 		}),
+		crematorium: new Feature({
+			name: "crematorium",
+			req: function() { return new ExpantaNum(CREMATORIUM_UNL).times(tmp.collapse ? tmp.collapse.crematorium.lrm : 1) },
+			res: ["collapse", "cadavers"],
+			display: showNum,
+			reached: function() { return player.collapse.crematorium.unl },
+			progress: function () {
+				if (player.options.featPerc=="logarithm") {
+					return player.collapse.cadavers
+						.max(1)
+						.log10()
+						.div(new ExpantaNum(CREMATORIUM_UNL).times(tmp.collapse ? tmp.collapse.crematorium.lrm : 1).log10().max(1));
+				} else return player.collapse.cadavers.div(new ExpantaNum(CREMATORIUM_UNL).times(tmp.collapse ? tmp.collapse.crematorium.lrm : 1))
+			}
+		}),
 		dc: new Feature({
 			name: "dc",
 			req: function() { return new ExpantaNum(DC_UNL).mul(tmp.dc ? tmp.dc.lrm : 1) },
@@ -90,23 +105,23 @@ function loadTempFeatures() {
 		}),
 		infinity: new Feature({
 			name: "infinity",
-			req: function() { return new ExpantaNum(INF_UNL) },
+			req: function() { return new ExpantaNum(INF_UNL).times(DISTANCES.uni) },
 			res: "distance",
 			display: formatDistance,
 			reached: function() { return player.inf.unl },
 			progress: function () {
-				if (player.options.featPerc=="logarithm") return player.distance.max(1).log10().div(new ExpantaNum(INF_UNL).log10());
-				else return player.distance.div(INF_UNL)
+				if (player.options.featPerc=="logarithm") return player.distance.max(1).log10().div(new ExpantaNum(INF_UNL).times(DISTANCES.uni).log10());
+				else return player.distance.div(INF_UNL).times(DISTANCES.uni)
 			}
 		}),
 		ascension: new Feature({
 			name: "ascension",
-			req: function() { return new ExpantaNum(10) },
+			req: function() { return new ExpantaNum(12) },
 			res: ["inf", "endorsements"],
 			display: showNum,
-			reached: function() { return player.inf.endorsements.gte(10) },
+			reached: function() { return player.inf.endorsements.gte(12) },
 			progress: function () {
-				return player.inf.endorsements.div(10);
+				return player.inf.endorsements.div(12);
 			}
 		}),
 		stadium: new Feature({

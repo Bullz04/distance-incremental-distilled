@@ -27,7 +27,7 @@ const NEWS_DATA = {
 	m8: ["If you want to be cursed, try Engineering Notation"],
 	m9: ["There is no True Infinity here"],
 	m10: ["Try a byte of binary notation!"],
-	m11: ["Pentation is for the weak"],
+	m11: ["Subtraction is for the strong"],
 	m12: ["If you can see this, you are officially Canadian"],
 	m13: ["5 lighthours until the update"],
 	m14: ["You should try Absurd Mode, you might have fun"],
@@ -123,6 +123,8 @@ const NEWS_DATA = {
 	m104: ["We're lucky that our universes were never infected, I'm sure there's some parallel multiverse out there where that's an issue..."],
 	m105: ["Some people say that each multiverse does not have its own High Gods. Those people tend not to survive very long around here."],
 	m106: ["Some people say that there is only one set of High Gods. Those people tend not to survive very long around here."],
+	m107: ["\"I just got Game Over in this game, how??\" - Someone played with [REDACTED] mode"],
+	m108: ["Rumors say that you will die of jumpscare randomly around " + (Math.floor((Math.random()*12)+1)) + " " + ((Math.random()>0.5)?"A.M.":"P.M.") + ", but is it true? Let's find out!"],
 
 	// Distance-based Conditions
 	d1: [
@@ -180,8 +182,23 @@ const NEWS_DATA = {
 		}
 	],
 	d10: [
+		"Rumors say that there is multiverse in this game, but is it true? Let's find out!",
+		function() { return !player.distance.gte(DISTANCES.mlt) },
+	],
+	d11: [
 		"The multiverse isn't enough for you, is it?",
 		function() { return player.distance.gte(DISTANCES.mlt) },
+	],
+	d12: [
+		"Multiverse, did Jacorb take the name from Marvel Studios or vice versa?",
+		function() { return player.distance.gte(EN.pow(DISTANCES.mlt, 100)) },
+	],
+	d13: [
+		"Rumors say that there are shop and gamepasses in this game, but is it true? Let's find out!",
+		function() {
+			return player.distance.gte(EN.pow(DISTANCES.mlt, "1e4"))
+			&& player.distance.lt(EN.pow(DISTANCES.mlt, "1e6000"))
+		},
 	],
 
 	// Mode-based Conditions
@@ -210,7 +227,7 @@ const NEWS_DATA = {
 		}
 	],
 	mod5: [
-		"The oyster is your oyster is your oyster is your oyster is your oyster",
+		"Demon?",
 		function () {
 			return player.modes.includes("extreme");
 		}

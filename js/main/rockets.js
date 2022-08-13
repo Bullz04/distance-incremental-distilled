@@ -2,7 +2,6 @@ function getRocketSoftcapStart() {
 	let sc = new ExpantaNum(LAYER_SC["rockets"]);
 	if (modeActive("hard")) sc = new ExpantaNum(1)
 	if (modeActive("easy")) sc = sc.times(1.1).round();
-	if (tmp.pathogens && player.pathogens.unl) sc = sc.times(tmp.pathogens[7].eff())
 	return sc
 }
 
@@ -10,7 +9,6 @@ function getRocketEffectSoftcapStart() {
 	let sc = new ExpantaNum(1 / 0);
 	if (modeActive("hard")) sc = sc.sub(0.5);
 	if (modeActive("easy")) sc = sc.plus(0.5);
-	if (tmp.pathogens && player.pathogens.unl) sc = sc.plus(tmp.pathogens[8].eff());
 	return sc
 }
 
@@ -23,7 +21,6 @@ function getRocketEffect() {
 	if (modeActive("easy")) eff = eff.times(2).plus(1);
 	if (eff.gte(getRocketEffectSoftcapStart())) eff = eff.sqrt().times(ExpantaNum.sqrt(getRocketEffectSoftcapStart()));
 	if (tmp.fn && modeActive("extreme")) if (player.rf.gt(0)) eff = eff.plus(tmp.fn.eff);
-	if (tmp.inf) if (tmp.inf.upgs.has("2;1")) eff = eff.times(INF_UPGS.effects["2;1"]());
 	if (tmp.inf) if (tmp.inf.upgs.has("9;2")) eff = eff.plus(INF_UPGS.effects["9;2"]());
 	if (tmp.inf) if (tmp.inf.upgs.has("6;10")) eff = eff.times(16)
 	if (player.elementary.foam.unl && tmp.elm) eff = eff.times(tmp.elm.qf.boost20)
@@ -46,9 +43,14 @@ function getRocketGainMult() {
 	if (tmp.ach[76].has) mult = mult.times(1.02);
 	if (tmp.ach[131].has) mult = mult.times(2);
 	if (modeActive("extreme") && player.rf.gt(0)) mult = mult.times(ExpantaNum.pow(2, player.furnace.upgrades[2].times(tmp.fn ? tmp.fn.upgPow : 1)));
+
 	if (player.rank.gte(rankRewardReq[11])) mult = mult.times(getRankEffects("12"))
 	if (player.rank.gte(rankRewardReq[13])) mult = mult.times(getRankEffects("14"));
 	if (player.rank.gte(rankRewardReq[27])) mult = mult.times(getRankEffects("28"))
+	if (player.rank.gte(rankRewardReq[38])) mult = mult.times(getRankEffects("39"))
+
+	if (player.tier.gte(tierRewardReq[9])) mult = mult.times(getTierEffects("10"))
+
 	if (player.tr.upgrades.includes(10) && !HCCBA("noTRU")) mult = mult.times(tr10Eff().max(1));
 	if (player.tr.upgrades.includes(28) && !HCCBA("noTRU") && modeActive("extreme")) mult = mult.times(player.furnace.coal.plus(1).pow(0.15));
 	if (player.tr.upgrades.includes(29) && !HCCBA("noTRU") && modeActive("extreme"))
@@ -59,7 +61,8 @@ function getRocketGainMult() {
 	if (hasCollapseMilestone(8)) mult = mult.times(collapseMile8Eff().max(1));
 	if (tmp.pathogens && player.pathogens.unl) mult = mult.times(tmp.pathogens[2].eff().max(1));
 	if (tmp.dc) if (player.dc.unl) mult = mult.times(tmp.dc.dmEff.max(1));
-	if (tmp.inf) if (tmp.inf.upgs.has("1;2")) mult = mult.times(INF_UPGS.effects["1;2"]().max(1));
+	if (tmp.inf) if (tmp.inf.upgs.has("1;2")) mult = mult.times(INF_UPGS.effects["1;2"]());
+	if (tmp.inf) if (tmp.inf.upgs.has("1;4")) mult = mult.times(INF_UPGS.effects["1;4"]());
 	if (tmp.inf) if (tmp.inf.upgs.has("4;8")) mult = mult.times(player.collapse.lifeEssence.max(1));
 	if (tmp.inf)
 		if (tmp.inf.upgs.has("9;8")) {

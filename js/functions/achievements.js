@@ -56,7 +56,7 @@ function checkR5Ach(){
 function checkR6Ach(){
 	if (player.pathogens.unl) tmp.ach[61].grant();
 	if (player.collapse.lifeEssence.gte(1e6)) tmp.ach[62].grant();
-	if (player.tr.cubes.gte("1e81")) tmp.ach[63].grant();
+	if (player.tr.cubes.gte("1e71")) tmp.ach[63].grant();
 	if (player.rank.gte(50)) tmp.ach[64].grant();
 	if (player.collapse.cadavers.gte(5e7)) tmp.ach[65].grant();
 	if (tmp.auto.fuelbot.interval.lte(120)) tmp.ach[66].grant();
@@ -80,29 +80,29 @@ function checkR7Ach(){
 function checkR8Ach(){
 	if (player.inf.unl) tmp.ach[81].grant();
 	if (player.inf.knowledge.gte(9000.1)) tmp.ach[82].grant();
-	if (player.inf.endorsements.gte(3)) tmp.ach[83].grant();
+	if (player.inf.endorsements.gte(2)) tmp.ach[83].grant();
 	if (tmp.auto.fuelbot.magnitude.gt(100)) tmp.ach[84].grant();
 	if (player.automation.intelligence.gte(1.79e308)) tmp.ach[85].grant();
 	if (player.distance.gte("4.4e1026")) tmp.ach[86].grant();
 	if (player.inf.knowledge.gte(25e9)) tmp.ach[87].grant();
-	if (player.inf.endorsements.gte(10)) tmp.ach[88].grant();
+	if (player.inf.endorsements.gte(7)) tmp.ach[88].grant();
 }
 
 function checkR9Ach(){
 	if (tmp.dc.flow.gte(8e3)) tmp.ach[91].grant();
-	if (player.collapse.cadavers.gte(1e80)) tmp.ach[92].grant();
+	if (player.collapse.cadavers.gte("1e1000")) tmp.ach[92].grant();
 	if (player.inf.ascension.power.gte(666)) tmp.ach[93].grant();
 	if (player.inf.endorsements.gte(14)) tmp.ach[94].grant();
 	if (player.inf.ascension.enlightenments.every(x => new ExpantaNum(x).gte(1))) tmp.ach[95].grant();
 	if (tmp.auto.rankbot.magnitude.gt(1e33)) tmp.ach[96].grant();
-	if (player.distance.gte(new ExpantaNum("1e1000")) && tmp.nopathogenupgs) tmp.ach[97].grant();
+	if (player.distance.gte(new ExpantaNum("1e650")) && tmp.nopathogenupgs) tmp.ach[97].grant();
 	if (player.distance.gte("4.4e786") && player.dc.cores.eq(0)) tmp.ach[98].grant();
 }
 
 function checkR10Ach(){
 	if (player.inf.stadium.completions.length > 0) tmp.ach[101].grant();
 	if (player.inf.ascension.enlightenments.every(x => new ExpantaNum(x).gte(2))) tmp.ach[102].grant();
-	if (player.dc.matter.gte(1e18)) tmp.ach[103].grant();
+	if (player.dc.matter.gte("1e250")) tmp.ach[103].grant();
 	if (player.inf.stadium.completions.length >= 3) tmp.ach[104].grant();
 	if (tmp.timeSpeed.gte(new ExpantaNum("2.22e2222"))) tmp.ach[105].grant();
 	if (player.inf.endorsements.gte(20)) tmp.ach[106].grant();
@@ -112,7 +112,7 @@ function checkR10Ach(){
 
 function checkR11Ach(){
 	if (tmp.auto.fuelbot.interval.lt(1)) tmp.ach[111].grant();
-	if (tmp.acc.gte("2.2e10022")) tmp.ach[112].grant();
+	if (tmp.acc.gte("1e1e5")) tmp.ach[112].grant();
 	if (tmp.pathogens.upgPow.gte(2.5)) tmp.ach[113].grant();
 	if (tmp.accEn.gte(4.4e26)) tmp.ach[114].grant();
 	if (player.inf.pantheon.purge.power.gt(0)) tmp.ach[115].grant();
@@ -140,7 +140,7 @@ function checkR13Ach(){
 	if (player.inf.pantheon.heavenlyChips.gte(2.5e7)) tmp.ach[135].grant()
 	if (player.velocity.gte("4.4e3750026")) tmp.ach[136].grant()
 	// ach137 is in the Elementary reset function
-	if (player.distance.gte("4.4e7826")&&player.inf.endorsements.lte(10)) tmp.ach[138].grant()
+	if (player.distance.gte("1e5e5")&&player.inf.endorsements.lte(10)) tmp.ach[138].grant()
 }
 
 function checkR14Ach(){
@@ -150,8 +150,8 @@ function checkR14Ach(){
 	if (player.inf.ascension.power.gte(1e33)) tmp.ach[144].grant()
 	if (player.distance.gte("4.4e8000026")) tmp.ach[145].grant()
 	if (player.inf.knowledge.gte("1.8e308")) tmp.ach[146].grant()
-	if (player.inf.endorsements.lte(10) && player.rank.gte(200)) tmp.ach[147].grant()
-	if (player.rank.gte(995)) tmp.ach[148].grant()
+	if (player.inf.endorsements.lte(10) && player.rank.gte(2000)) tmp.ach[147].grant()
+	if (player.rank.gte(2e4)) tmp.ach[148].grant()
 }
 
 function checkR15Ach(){

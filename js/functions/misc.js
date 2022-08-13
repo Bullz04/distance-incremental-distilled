@@ -7,6 +7,12 @@ function ENString(obj) {
 	if (ret.elementary === undefined) ret.elementary = deepCopy(DEFAULT_START.elementary);
 	if (ret.autoModes === undefined) ret.autoModes = {};
 	if (ret.autoTxt === undefined) ret.autoTxt = {};
+	if (ret.collapse === undefined) ret.collapse = deepCopy(DEFAULT_START.collapse)
+	if (ret.collapse.crematorium === undefined) ret.collapse.crematorium = deepCopy(DEFAULT_START.collapse.crematorium)
+	if (ret.collapse.crematorium.upgrades === undefined) ret.collapse.crematorium.upgrades = deepCopy(DEFAULT_START.collapse.crematorium.upgrades)
+	if (ret.collapse.crematorium.upgrades.repeatable === undefined) ret.collapse.crematorium.upgrades.repeatable = deepCopy(DEFAULT_START.collapse.crematorium.upgrades.repeatable)
+	if (ret.inf === undefined) ret.inf = deepCopy(DEFAULT_START.inf)
+	if (ret.inf.brain === undefined) ret.inf.brain = deepCopy(DEFAULT_START.inf.brain)
 	ret.distance = new ExpantaNum(ret.distance).toString();
 	ret.velocity = new ExpantaNum(ret.velocity).toString();
 	ret.rank = new ExpantaNum(ret.rank).toString();
@@ -26,6 +32,13 @@ function ENString(obj) {
 	ret.pathogens.amount = new ExpantaNum(ret.pathogens.amount).toString();
 	for (let i = 1; i <= Object.keys(ret.pathogens.upgrades).length; i++)
 		ret.pathogens.upgrades[i] = new ExpantaNum(ret.pathogens.upgrades[i]).toString();
+	ret.collapse.crematorium.ash = new ExpantaNum(ret.collapse.crematorium.ash).toString()
+	ret.collapse.crematorium.cremationFuel = new ExpantaNum(ret.collapse.crematorium.cremationFuel).toString()
+	ret.collapse.crematorium.incinerator.level = new ExpantaNum(ret.collapse.crematorium.incinerator.level).toString()
+	ret.collapse.crematorium.incinerator.timesProcessed = new ExpantaNum(ret.collapse.crematorium.incinerator.timesProcessed).toString()
+	ret.collapse.crematorium.incinerator.pendingProcess = new ExpantaNum(ret.collapse.crematorium.incinerator.pendingProcess).toString()
+	for (let i = 1; i <= Object.keys(ret.collapse.crematorium.upgrades.repeatable).length; i++)
+		ret.collapse.crematorium.upgrades.repeatable[i] = new ExpantaNum(ret.collapse.crematorium.upgrades.repeatable[i]).toString();
 	ret.dc.matter = new ExpantaNum(ret.dc.matter).toString();
 	ret.dc.energy = new ExpantaNum(ret.dc.energy).toString();
 	ret.dc.fluid = new ExpantaNum(ret.dc.fluid).toString();
@@ -36,6 +49,8 @@ function ENString(obj) {
 		ret.inf.ascension.time[i] = new ExpantaNum(ret.inf.ascension.time[i]).toString();
 		ret.inf.ascension.enlightenments[i] = new ExpantaNum(ret.inf.ascension.enlightenments[i]).toString();
 	}
+	ret.inf.brain.mindMachines = new ExpantaNum(ret.inf.brain.mindMachines).toString()
+	ret.inf.brain.neurons = new ExpantaNum(ret.inf.brain.neurons).toString()
 	ret.inf.ascension.power = new ExpantaNum(ret.inf.ascension.power).toString();
 	ret.inf.pantheon.gems = new ExpantaNum(ret.inf.pantheon.gems).toString();
 	ret.inf.pantheon.angels = new ExpantaNum(ret.inf.pantheon.angels).toString();
@@ -160,10 +175,25 @@ function ENString(obj) {
 	return ret;
 }
 
+
+
 function transformToEN(obj, sc = DEFAULT_START) {
 	let ret = deepCopy(obj);
-	for (const key in sc) if (ret[key] === undefined) ret[key] = deepCopy(sc[key]);
+	for (let key in sc) {
+		if (ret[key] === undefined) {
+			ret[key] = deepCopy(sc[key])
+		}
+	};/**/
+	//deepCopyObject(ret, sc)
 	for (const key in sc.options) if (ret.options[key] === undefined) ret.options[key] = deepCopy(sc.options[key]);
+	{
+		for (const key in sc.collapse) if (ret.collapse[key] === undefined) ret.collapse[key] = deepCopy(sc.collapse[key]);
+		for (const key in sc.collapse.crematorium) if (ret.collapse.crematorium[key] === undefined) ret.collapse.crematorium[key] = deepCopy(sc.collapse.crematorium[key]);
+		for (const key in sc.collapse.crematorium.upgrades) if (ret.collapse.crematorium.upgrades[key] === undefined) ret.collapse.crematorium.upgrades[key] = deepCopy(sc.collapse.crematorium.upgrades[key]);
+		for (const key in sc.collapse.crematorium.upgrades.repeatable) if (ret.collapse.crematorium.upgrades.repeatable[key] === undefined) ret.collapse.crematorium.upgrades.repeatable[key] = deepCopy(sc.collapse.crematorium.upgrades.repeatable[key]);
+		for (const key in sc.inf) if (ret.inf[key] === undefined) ret.inf[key] = deepCopy(sc.inf[key]);
+		for (const key in sc.inf.brain) if (ret.inf.brain[key] === undefined) ret.inf.brain[key] = deepCopy(sc.inf.brain[key]);
+	}
 	if (ret.version === undefined || !ret.inf.ascension) {
 		ret.inf.ascension = deepCopy(sc.inf.ascension);
 		ret.version = 1.0;
@@ -210,6 +240,13 @@ function transformToEN(obj, sc = DEFAULT_START) {
 	ret.pathogens.amount = new ExpantaNum(ret.pathogens.amount);
 	for (let i = 1; i <= Object.keys(sc.pathogens.upgrades).length; i++)
 		ret.pathogens.upgrades[i] = new ExpantaNum(ret.pathogens.upgrades[i] || 0);
+	ret.collapse.crematorium.ash = new ExpantaNum(ret.collapse.crematorium.ash)
+	ret.collapse.crematorium.cremationFuel = new ExpantaNum(ret.collapse.crematorium.cremationFuel)
+	ret.collapse.crematorium.incinerator.level = new ExpantaNum(ret.collapse.crematorium.incinerator.level || 0)
+	ret.collapse.crematorium.incinerator.timesProcessed = new ExpantaNum(ret.collapse.crematorium.incinerator.timesProcessed)
+	ret.collapse.crematorium.incinerator.pendingProcess = new ExpantaNum(ret.collapse.crematorium.incinerator.pendingProcess || 0)
+	for (let i = 1; i <= Object.keys(ret.collapse.crematorium.upgrades.repeatable).length; i++)
+		ret.collapse.crematorium.upgrades.repeatable[i] = new ExpantaNum(ret.collapse.crematorium.upgrades.repeatable[i] || 0);
 	ret.dc.matter = new ExpantaNum(ret.dc.matter);
 	ret.dc.energy = new ExpantaNum(ret.dc.energy);
 	ret.dc.fluid = new ExpantaNum(ret.dc.fluid);
@@ -220,6 +257,8 @@ function transformToEN(obj, sc = DEFAULT_START) {
 		ret.inf.ascension.time[i] = new ExpantaNum(ret.inf.ascension.time[i]);
 		ret.inf.ascension.enlightenments[i] = new ExpantaNum(ret.inf.ascension.enlightenments[i]);
 	}
+	ret.inf.brain.neurons = new ExpantaNum(ret.inf.brain.neurons)
+	ret.inf.brain.mindMachines = new ExpantaNum(ret.inf.brain.mindMachines)
 	ret.inf.ascension.power = new ExpantaNum(ret.inf.ascension.power);
 	ret.inf.pantheon.gems = new ExpantaNum(ret.inf.pantheon.gems);
 	ret.inf.pantheon.angels = new ExpantaNum(ret.inf.pantheon.angels);
@@ -346,6 +385,165 @@ function transformToEN(obj, sc = DEFAULT_START) {
 	return ret;
 }
 
+function loadPlayerValues() {
+	ret.distance = new ExpantaNum(ret.distance);
+	ret.velocity = new ExpantaNum(ret.velocity);
+	ret.rank = new ExpantaNum(ret.rank);
+	ret.tier = new ExpantaNum(ret.tier);
+	ret.rockets = new ExpantaNum(ret.rockets);
+	ret.rf = new ExpantaNum(ret.rf);
+	ret.automation.scraps = new ExpantaNum(ret.automation.scraps);
+	ret.automation.intelligence = new ExpantaNum(ret.automation.intelligence);
+	for (let i = 0; i < Object.values(ret.automation.robots).length; i++)
+		for (let j = 0; j <= 1; j++)
+			ret.automation.robots[Object.keys(ret.automation.robots)[i]][j] = new ExpantaNum(
+				Object.values(ret.automation.robots)[i][j]
+			);
+	ret.tr.cubes = new ExpantaNum(ret.tr.cubes);
+	ret.collapse.cadavers = new ExpantaNum(ret.collapse.cadavers);
+	ret.collapse.lifeEssence = new ExpantaNum(ret.collapse.lifeEssence);
+	ret.pathogens.amount = new ExpantaNum(ret.pathogens.amount);
+	for (let i = 1; i <= Object.keys(sc.pathogens.upgrades).length; i++)
+		ret.pathogens.upgrades[i] = new ExpantaNum(ret.pathogens.upgrades[i] || 0);
+	ret.crematorium.ash = new ExpantaNum(ret.crematorium.ash)
+	ret.crematorium.cremationFuel = new ExpantaNum(ret.crematorium.cremationFuel)
+	ret.crematorium.incinerator.level = new ExpantaNum(ret.crematorium.incinerator.level || 0) 
+	ret.dc.matter = new ExpantaNum(ret.dc.matter);
+	ret.dc.energy = new ExpantaNum(ret.dc.energy);
+	ret.dc.fluid = new ExpantaNum(ret.dc.fluid);
+	ret.dc.cores = new ExpantaNum(ret.dc.cores);
+	ret.inf.endorsements = new ExpantaNum(ret.inf.endorsements);
+	ret.inf.knowledge = new ExpantaNum(ret.inf.knowledge);
+	for (let i = 0; i < 4; i++) {
+		ret.inf.ascension.time[i] = new ExpantaNum(ret.inf.ascension.time[i]);
+		ret.inf.ascension.enlightenments[i] = new ExpantaNum(ret.inf.ascension.enlightenments[i]);
+	}
+	
+	ret.inf.ascension.power = new ExpantaNum(ret.inf.ascension.power);
+	ret.inf.pantheon.gems = new ExpantaNum(ret.inf.pantheon.gems);
+	ret.inf.pantheon.angels = new ExpantaNum(ret.inf.pantheon.angels);
+	ret.inf.pantheon.demons = new ExpantaNum(ret.inf.pantheon.demons);
+	ret.inf.pantheon.heavenlyChips = new ExpantaNum(ret.inf.pantheon.heavenlyChips);
+	ret.inf.pantheon.demonicSouls = new ExpantaNum(ret.inf.pantheon.demonicSouls);
+	ret.inf.pantheon.hauntingEnergy = new ExpantaNum(ret.inf.pantheon.hauntingEnergy||0);
+	ret.inf.pantheon.purge.power = new ExpantaNum(ret.inf.pantheon.purge.power);
+	if (Object.keys(ret.inf.derivatives.amts).length > 0)
+		for (const key in ret.inf.derivatives.amts)
+			ret.inf.derivatives.amts[key] = new ExpantaNum(ret.inf.derivatives.amts[key]);
+	ret.inf.derivatives.unlocks = new ExpantaNum(ret.inf.derivatives.unlocks);
+	ret.inf.bestDist = new ExpantaNum(ret.inf.bestDist);
+	ret.bestDistance = new ExpantaNum(ret.bestDistance)
+	ret.bestV = new ExpantaNum(ret.bestV)
+	ret.bestA = new ExpantaNum(ret.bestA)
+	ret.bestEnd = new ExpantaNum(ret.bestEnd)
+	ret.bestEP = new ExpantaNum(ret.bestEP)
+	ret.bestDemonicSouls = new ExpantaNum(ret.bestDemonicSouls);
+	ret.elementary.times = new ExpantaNum(ret.elementary.times);
+	ret.elementary.particles = new ExpantaNum(ret.elementary.particles);
+	ret.elementary.fermions.amount = new ExpantaNum(ret.elementary.fermions.amount);
+	ret.elementary.fermions.quarks.amount = new ExpantaNum(ret.elementary.fermions.quarks.amount);
+	ret.elementary.fermions.leptons.amount = new ExpantaNum(ret.elementary.fermions.leptons.amount);
+	ret.elementary.bosons.amount = new ExpantaNum(ret.elementary.bosons.amount);
+	ret.elementary.bosons.gauge.amount = new ExpantaNum(ret.elementary.bosons.gauge.amount);
+	ret.elementary.bosons.gauge.force = new ExpantaNum(ret.elementary.bosons.gauge.force);
+	ret.elementary.bosons.gauge.photons.amount = new ExpantaNum(ret.elementary.bosons.gauge.photons.amount);
+	for (let i = 0; i < 4; i++)
+		ret.elementary.bosons.gauge.photons.upgrades[i] = new ExpantaNum(
+			ret.elementary.bosons.gauge.photons.upgrades[i]||0
+		);
+	ret.elementary.bosons.gauge.w = new ExpantaNum(ret.elementary.bosons.gauge.w);
+	ret.elementary.bosons.gauge.z = new ExpantaNum(ret.elementary.bosons.gauge.z);
+	ret.elementary.bosons.gauge.gluons.r = {
+		amount: new ExpantaNum(ret.elementary.bosons.gauge.gluons.r.amount),
+		upgrades: [
+			new ExpantaNum(ret.elementary.bosons.gauge.gluons.r.upgrades[0]),
+			new ExpantaNum(ret.elementary.bosons.gauge.gluons.r.upgrades[1]),
+			new ExpantaNum(ret.elementary.bosons.gauge.gluons.r.upgrades[2]||0)
+		]
+	};
+	ret.elementary.bosons.gauge.gluons.g = {
+		amount: new ExpantaNum(ret.elementary.bosons.gauge.gluons.g.amount),
+		upgrades: [
+			new ExpantaNum(ret.elementary.bosons.gauge.gluons.g.upgrades[0]),
+			new ExpantaNum(ret.elementary.bosons.gauge.gluons.g.upgrades[1]),
+			new ExpantaNum(ret.elementary.bosons.gauge.gluons.g.upgrades[2]||0)
+		]
+	};
+	ret.elementary.bosons.gauge.gluons.b = {
+		amount: new ExpantaNum(ret.elementary.bosons.gauge.gluons.b.amount),
+		upgrades: [
+			new ExpantaNum(ret.elementary.bosons.gauge.gluons.b.upgrades[0]),
+			new ExpantaNum(ret.elementary.bosons.gauge.gluons.b.upgrades[1]),
+			new ExpantaNum(ret.elementary.bosons.gauge.gluons.b.upgrades[2]||0)
+		]
+	};
+	ret.elementary.bosons.gauge.gluons.ar = {
+		amount: new ExpantaNum(ret.elementary.bosons.gauge.gluons.ar.amount),
+		upgrades: [
+			new ExpantaNum(ret.elementary.bosons.gauge.gluons.ar.upgrades[0]),
+			new ExpantaNum(ret.elementary.bosons.gauge.gluons.ar.upgrades[1]),
+			new ExpantaNum(ret.elementary.bosons.gauge.gluons.ar.upgrades[2]||0)
+		]
+	};
+	ret.elementary.bosons.gauge.gluons.ag = {
+		amount: new ExpantaNum(ret.elementary.bosons.gauge.gluons.ag.amount),
+		upgrades: [
+			new ExpantaNum(ret.elementary.bosons.gauge.gluons.ag.upgrades[0]),
+			new ExpantaNum(ret.elementary.bosons.gauge.gluons.ag.upgrades[1]),
+			new ExpantaNum(ret.elementary.bosons.gauge.gluons.ag.upgrades[2]||0)
+		]
+	};
+	ret.elementary.bosons.gauge.gluons.ab = {
+		amount: new ExpantaNum(ret.elementary.bosons.gauge.gluons.ab.amount),
+		upgrades: [
+			new ExpantaNum(ret.elementary.bosons.gauge.gluons.ab.upgrades[0]),
+			new ExpantaNum(ret.elementary.bosons.gauge.gluons.ab.upgrades[1]),
+			new ExpantaNum(ret.elementary.bosons.gauge.gluons.ab.upgrades[2]||0)
+		]
+	};
+	ret.elementary.bosons.gauge.gravitons = new ExpantaNum(ret.elementary.bosons.gauge.gravitons);
+	ret.elementary.bosons.scalar.amount = new ExpantaNum(ret.elementary.bosons.scalar.amount);
+	ret.elementary.bosons.scalar.higgs.amount = new ExpantaNum(ret.elementary.bosons.scalar.higgs.amount);
+	ret.elementary.theory.points = new ExpantaNum(ret.elementary.theory.points);
+	ret.elementary.theory.depth = new ExpantaNum(ret.elementary.theory.depth);
+	ret.elementary.theory.bestDepth = new ExpantaNum(ret.elementary.theory.bestDepth).max(ret.elementary.theory.depth);
+	ret.elementary.theory.supersymmetry.squarks = new ExpantaNum(ret.elementary.theory.supersymmetry.squarks);
+	ret.elementary.theory.supersymmetry.sleptons = new ExpantaNum(ret.elementary.theory.supersymmetry.sleptons);
+	ret.elementary.theory.supersymmetry.neutralinos = new ExpantaNum(ret.elementary.theory.supersymmetry.neutralinos);
+	ret.elementary.theory.supersymmetry.charginos = new ExpantaNum(ret.elementary.theory.supersymmetry.charginos);
+	ret.elementary.theory.tree.spent = new ExpantaNum(ret.elementary.theory.tree.spent);
+	if (Object.keys(ret.elementary.theory.tree.upgrades).length>0) for (let i=0;i<Object.keys(ret.elementary.theory.tree.upgrades).length;i++) ret.elementary.theory.tree.upgrades[Object.keys(ret.elementary.theory.tree.upgrades)[i]] = new ExpantaNum(ret.elementary.theory.tree.upgrades[Object.keys(ret.elementary.theory.tree.upgrades)[i]]);
+	for (let i=0;i<10;i++) ret.elementary.theory.strings.amounts[i] = new ExpantaNum(ret.elementary.theory.strings.amounts[i]||0);
+	ret.elementary.theory.strings.entangled = new ExpantaNum(ret.elementary.theory.strings.entangled);
+	ret.elementary.theory.preons.amount = new ExpantaNum(ret.elementary.theory.preons.amount);
+	ret.elementary.theory.preons.boosters = new ExpantaNum(ret.elementary.theory.preons.boosters);
+	ret.elementary.theory.accelerons.amount = new ExpantaNum(ret.elementary.theory.accelerons.amount);
+	ret.elementary.theory.accelerons.expanders = new ExpantaNum(ret.elementary.theory.accelerons.expanders);
+	ret.elementary.theory.inflatons.amount = new ExpantaNum(ret.elementary.theory.inflatons.amount);
+	ret.elementary.time = new ExpantaNum(ret.elementary.time||0);
+	ret.elementary.hc.best = new ExpantaNum(ret.elementary.hc.best);
+	ret.elementary.hc.hadrons = new ExpantaNum(ret.elementary.hc.hadrons);
+	ret.elementary.hc.claimed = new ExpantaNum(ret.elementary.hc.claimed||0);
+	if (Object.keys(ret.autoTxt).length>0) for (let i=0;i<Object.keys(ret.autoTxt).length;i++) ret.autoTxt[Object.keys(ret.autoTxt)[i]] = new ExpantaNum(ret.autoTxt[Object.keys(ret.autoTxt)[i]])
+	for (let i=0;i<5;i++) ret.elementary.foam.amounts[i] = new ExpantaNum(ret.elementary.foam.amounts[i]||0);
+	ret.elementary.foam.maxDepth = new ExpantaNum(ret.elementary.foam.maxDepth||1);
+	for (let i=0;i<15;i++) ret.elementary.foam.upgrades[i] = new ExpantaNum(ret.elementary.foam.upgrades[i]||0);
+	ret.elementary.entropy.bestDepth = new ExpantaNum(ret.elementary.entropy.bestDepth||1);
+	ret.elementary.entropy.amount = new ExpantaNum(ret.elementary.entropy.amount||0);
+	ret.elementary.entropy.best = new ExpantaNum(ret.elementary.entropy.best||0);
+	ret.elementary.sky.amount = new ExpantaNum(ret.elementary.sky.amount||0);
+	ret.elementary.sky.pions.amount = new ExpantaNum(ret.elementary.sky.pions.amount||0);
+	ret.elementary.sky.spinors.amount = new ExpantaNum(ret.elementary.sky.spinors.amount||0);
+	for (let i=0;i<Object.keys(ret.elementary.sky.pions.field).length;i++) ret.elementary.sky.pions.field[Object.keys(ret.elementary.sky.pions.field)[i]] = new ExpantaNum(ret.elementary.sky.pions.field[Object.keys(ret.elementary.sky.pions.field)[i]]||0);
+	for (let i=0;i<Object.keys(ret.elementary.sky.spinors.field).length;i++) ret.elementary.sky.spinors.field[Object.keys(ret.elementary.sky.spinors.field)[i]] = new ExpantaNum(ret.elementary.sky.spinors.field[Object.keys(ret.elementary.sky.spinors.field)[i]]||0);
+	ret.mlt.times = new ExpantaNum(ret.mlt.times);
+	ret.mlt.energy = new ExpantaNum(ret.mlt.energy);
+	ret.mlt.bestEnergy = new ExpantaNum(ret.mlt.bestEnergy);
+	ret.mlt.totalEnergy = new ExpantaNum(ret.mlt.totalEnergy);
+	for (let i=0;i<Object.keys(ret.mlt.quiltUpgs).length;i++) ret.mlt.quiltUpgs[Object.keys(ret.mlt.quiltUpgs)[i]] = new ExpantaNum(ret.mlt.quiltUpgs[Object.keys(ret.mlt.quiltUpgs)[i]]);
+	ret.version = Math.max(ret.version, sc.version);
+}
+
 function primesLTE(x) {
 	x = new ExpantaNum(x).round();
 	if (x.lte(1)) return new ExpantaNum(0);
@@ -419,7 +617,7 @@ async function showHiddenDiv(data) {
 	resetContainer.appendChild(reset);
 	document.body.appendChild(resetContainer);
 
-	await sleep(3);
+	await sleep(2);
 	if (document.getElementById("resetContainerBody")) document.getElementById("resetContainerBody").style.display = "";
 }
 
@@ -428,7 +626,7 @@ async function closeHiddenDiv(fast=false) {
 	if (!element) return;
 	document.getElementById("resetContainerBody").style.display = "none";
 	document.getElementById("reset").className = "hiddenDivShrink";
-	if (!fast) await sleep(1.4);
+	if (!fast) await sleep(1);
 	if (!element.parentNode) return;
 	element.parentNode.removeChild(element);
 	showContainer = true;
@@ -439,8 +637,12 @@ function sleep(s) {
 	return new Promise(resolve => setTimeout(resolve, s * 1000));
 }
 
+function pauseGame() {
+	gamePaused = !gamePaused
+}
+
 function nerfOfflineProg(time) {
 	time = new ExpantaNum(time).div(1000);
-	if (time.gt(60)) time = time.pow(3/4).times(Math.pow(60, 1/4));
+	if (time.gt(120)) time = time.pow(2/3).times(Math.pow(120, 1/3));
 	return time.times(1000).max(0);
 }
